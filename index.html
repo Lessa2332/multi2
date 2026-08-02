@@ -663,18 +663,60 @@ function toggleRecording() {
 
 // ===================== BATCH PARSING =====================
 function parsePromptForBatch(text) {
-    // Try range: "з 5 по 8", "from 5 to 8", "5 through 8"
-    let rangeMatch = text.match(/(?:з|від|from)\s*(\d+)\s*(?:по|до|to|through)\s*(\d+)/i);
+    let normalized = text.toLowerCase();
+    
+    // ====== УКРАЇНСЬКІ СЛОВА-ЧИСЛА ======
+    const ukWords = {
+        'один':1, 'два':2, 'три':3, 'чотири':4, "п'ять":5, 'пять':5, 'шість':6, 'сім':7, 'вісім':8, "дев'ять":9, 'девять':9, 'десять':10,
+        'перший':1, 'другий':2, 'третій':3, 'четвертий':4, "п'ятий":5, 'пятий':5, 'шостий':6, 'сьомий':7, 'восьмий':8, "дев'ятий":9, 'девятий':9, 'десятий':10,
+        'одинадцятий':11, 'дванадцятий':12, 'тринадцятий':13, 'чотирнадцятий':14, "п'ятнадцятий":15, 'пятнадцятий':15, 'шістнадцятий':16, 'сімнадцятий':17, 'вісімнадцятий':18, "дев'ятнадцятий":19, 'девятнадцятий':19, 'двадцятий':20,
+        'двадцять':20, 'тридцять':30, 'сорок':40, "п'ятдесят":50, 'пятдесят':50
+    };
+    // Складені: двадцять перший → 21
+    const ukCompound = {
+        'двадцять перший':21, 'двадцять другий':22, 'двадцять третій':23, 'двадцять четвертий':24, "двадцять п'ятий":25, 'двадцять пятий':25,
+        'двадцять шостий':26, 'двадцять сьомий':27, 'двадцять восьмий':28, "двадцять дев'ятий":29, 'двадцять девятий':29,
+        'тридцять перший':31, 'тридцять другий':32, 'тридцять третій':33, 'тридцять четвертий':34, "тридцять п'ятий":35
+    };
+    
+    // ====== АНГЛІЙСЬКІ СЛОВА-ЧИСЛА ======
+    const enWords = {
+        'one':1, 'two':2, 'three':3, 'four':4, 'five':5, 'six':6, 'seven':7, 'eight':8, 'nine':9, 'ten':10,
+        'first':1, 'second':2, 'third':3, 'fourth':4, 'fifth':5, 'sixth':6, 'seventh':7, 'eighth':8, 'ninth':9, 'tenth':10,
+        'eleventh':11, 'twelfth':12, 'thirteenth':13, 'fourteenth':14, 'fifteenth':15, 'sixteenth':16, 'seventeenth':17, 'eighteenth':18, 'nineteenth':19, 'twentieth':20,
+        'twenty':20, 'thirty':30, 'forty':40, 'fifty':50
+    };
+    const enCompound = {
+        'twenty first':21, 'twenty second':22, 'twenty third':23, 'twenty fourth':24, 'twenty fifth':25,
+        'twenty sixth':26, 'twenty seventh':27, 'twenty eighth':28, 'twenty ninth':29,
+        'thirty first':31, 'thirty second':32, 'thirty third':33, 'thirty fourth':34, 'thirty fifth':35
+    };
+    
+    // Заміна складених (спочатку, щоб не розбити на частини)
+    for (const [phrase, num] of Object.entries(ukCompound)) {
+        normalized = normalized.replace(new RegExp(phrase.replace(/'/g, "['’]?"), 'gi'), num.toString());
+    }
+    for (const [phrase, num] of Object.entries(enCompound)) {
+        normalized = normalized.replace(new RegExp('\\b' + phrase + '\\b', 'gi'), num.toString());
+    }
+    // Заміна простих слів
+    for (const [word, num] of Object.entries(ukWords)) {
+        normalized = normalized.replace(new RegExp('\\b' + word.replace(/'/g, "['’]?") + '\\b', 'gi'), num.toString());
+    }
+    for (const [word, num] of Object.entries(enWords)) {
+        normalized = normalized.replace(new RegExp('\\b' + word + '\\b', 'gi'), num.toString());
+    }
+    
+    // ====== ПАРСИНГ ДІАПАЗОНУ ======
+    let rangeMatch = normalized.match(/(?:з|від|from)\s*(\d+)\s*(?:по|до|to|through)\s*(\d+)/i);
     let lessons = [];
     if (rangeMatch) {
         const start = parseInt(rangeMatch[1]), end = parseInt(rangeMatch[2]);
         for (let i = Math.min(start, end); i <= Math.max(start, end); i++) lessons.push(i);
     } else {
-        // Try list: "5, 6, 7" or single "урок 5"
-        const allNums = text.match(/\d+/g);
+        const allNums = normalized.match(/\d+/g);
         if (allNums) {
-            // If single number and no commas, it's one lesson
-            const hasComma = text.includes(',') || text.includes(' і ') || text.includes(' та ') || text.includes(' and ');
+            const hasComma = normalized.includes(',') || normalized.includes(' і ') || normalized.includes(' та ') || normalized.includes(' and ');
             if (hasComma) {
                 lessons = [...new Set(allNums.map(n => parseInt(n)))].sort((a, b) => a - b);
             } else {
@@ -682,6 +724,17 @@ function parsePromptForBatch(text) {
             }
         }
     }
+    
+    const classMatch = text.match(/(\d+)[\s-]*клас/i) || text.match(/grade\s*(\d+)/i);
+    const topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i) || text.match(/topic\s+(.+?)(?:,|for|from|lesson|$)/i);
+    
+    return {
+        lessons: lessons,
+        classGrade: classMatch ? parseInt(classMatch[1]) : 7,
+        topicHint: topicMatch ? topicMatch[1].trim() : null,
+        raw: text
+    };
+}
     const classMatch = text.match(/(\d+)[\s-]*клас/i) || text.match(/grade\s*(\d+)/i);
     const topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i) || text.match(/topic\s+(.+?)(?:,|for|from|lesson|$)/i);
     return {
