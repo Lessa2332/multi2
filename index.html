@@ -782,10 +782,12 @@ class GeminiClient {
     }
 }
 
+
 class Orchestrator {
     constructor(geminiKey, driveToken) {
         this.gemini = new GeminiClient(geminiKey);
         this.drive = new DriveClient(driveToken);
+        this.lang = currentLang;
     }
 
     parsePrompt(text) {
@@ -842,9 +844,17 @@ class Orchestrator {
         addLog('ANALYST', t('analystPreview') + ' "' + preview + '..."');
         var ktpPreview = ktpContent.substring(0, 25000);
         addLog('ANALYST', t('analystAnalyze'));
-        var analysisPrompt = 'You are an analyst of school curricula. Analyze the KTP text below and find lesson #' + (parsed.lessonNum || 'specified') + '.\n' +
-            (parsed.topicHint ? 'The lesson topic should relate to: "' + parsed.topicHint + '"\n' : '') +
-            'Extract and return STRICTLY in JSON format without markdown:\n{\n  "topic": "full lesson topic",\n  "objective": "lesson objective",\n  "type": "lesson type (combined, new knowledge, reinforcement, etc.)",\n  "equipment": "equipment and visuals",\n  "competencies": "competencies being formed",\n  "duration": "number of hours",\n  "found": true,\n  "lessonNumber": ' + (parsed.lessonNum || 'null') + '\n}\nIf lesson not found, return {"found": false, "reason": "explanation"}\n\nKTP text:\n' + ktpPreview;
+
+        var isUkrainian = this.lang === 'uk';
+
+        var analysisPrompt = isUkrainian 
+            ? ('Ти — аналітик навчальних планів. Проаналізуй текст КТП нижче та знайди урок №' + (parsed.lessonNum || 'вказаний') + '.\n' +
+               (parsed.topicHint ? 'Тема уроку повинна стосуватися: "' + parsed.topicHint + '"\n' : '') +
+               'Витягни та поверни СТРОГО у форматі JSON без markdown:\n{\n  "topic": "повна тема уроку",\n  "objective": "мета уроку",\n  "type": "тип уроку (комбінований, урок нового знання, урок закріплення тощо)",\n  "equipment": "обладнання та наочність",\n  "competencies": "формування компетенцій",\n  "duration": "кількість годин",\n  "found": true,\n  "lessonNumber": ' + (parsed.lessonNum || 'null') + '\n}\nЯкщо урок не знайдено, поверни {"found": false, "reason": "пояснення чому не знайдено"}\n\nТекст КТП:\n' + ktpPreview)
+            : ('You are an analyst of school curricula. Analyze the KTP text below and find lesson #' + (parsed.lessonNum || 'specified') + '.\n' +
+               (parsed.topicHint ? 'The lesson topic should relate to: "' + parsed.topicHint + '"\n' : '') +
+               'Extract and return STRICTLY in JSON format without markdown:\n{\n  "topic": "full lesson topic",\n  "objective": "lesson objective",\n  "type": "lesson type (combined, new knowledge, reinforcement, etc.)",\n  "equipment": "equipment and visuals",\n  "competencies": "competencies being formed",\n  "duration": "number of hours",\n  "found": true,\n  "lessonNumber": ' + (parsed.lessonNum || 'null') + '\n}\nIf lesson not found, return {"found": false, "reason": "explanation"}\n\nKTP text:\n' + ktpPreview);
+
         var analysisText = await this.gemini.generate(analysisPrompt, 0.1);
         var lessonData;
         try {
@@ -852,17 +862,25 @@ class Orchestrator {
             lessonData = JSON.parse(cleanJson);
         } catch(e) {
             lessonData = {
-                found: true, topic: parsed.topicHint || 'Lesson Topic',
-                objective: 'Master new material', type: 'Combined lesson',
-                equipment: 'Textbook, atlas, contour map', competencies: 'Subject and general',
-                duration: '45 min', lessonNumber: parsed.lessonNum
+                found: true, 
+                topic: parsed.topicHint || (isUkrainian ? 'Тема уроку' : 'Lesson Topic'),
+                objective: isUkrainian ? 'Опанувати новий матеріал' : 'Master new material',
+                type: isUkrainian ? 'Комбінований урок' : 'Combined lesson',
+                equipment: isUkrainian ? 'Підручник, атлас, контурна карта' : 'Textbook, atlas, contour map',
+                competencies: isUkrainian ? 'Предметні та загальнонавчальні' : 'Subject and general',
+                duration: '45 ' + (isUkrainian ? 'хв' : 'min'),
+                lessonNumber: parsed.lessonNum
             };
         }
         if (!lessonData.found) throw new Error(lessonData.reason || t('errorLesson'));
         addLog('ANALYST', t('analystFoundLesson') + ' "' + lessonData.topic + '"');
-        addLog('ANALYST', t('analystType') + ' ' + lessonData.type + ' | ' + (currentLang === 'uk' ? 'Обладнання' : 'Equipment') + ': ' + (lessonData.equipment || 'N/A'));
+        addLog('ANALYST', t('analystType') + ' ' + lessonData.type + ' | ' + (isUkrainian ? 'Обладнання' : 'Equipment') + ': ' + (lessonData.equipment || 'N/A'));
         addLog('METHODIST', t('methodistGenerate'));
-        var methodistPrompt = 'You are an experienced geography methodologist. Create a detailed, professional lesson plan for grade ' + parsed.classGrade + ' (age 12-13).\n\nData from KTP:\n- Topic: ' + lessonData.topic + '\n- Objective: ' + lessonData.objective + '\n- Type: ' + lessonData.type + '\n- Equipment: ' + (lessonData.equipment || 'atlas, textbook, contour map') + '\n- Competencies: ' + (lessonData.competencies || 'subject') + '\n- Duration: ' + (lessonData.duration || '45 minutes') + '\n\nREQUIREMENTS:\n1. Full structure with timing for each stage\n2. Specific questions for students, expected answers\n3. Interactive elements: pair work, mini-research, interesting facts\n4. Adaptation for age ' + parsed.classGrade + ' (accessible language but no content simplification)\n5. Mandatory: geographical nomenclature, map work, practical tasks\n\nFORMAT: HTML. Use only these tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nSTRUCTURE:\n<h1>Lesson Plan #' + (lessonData.lessonNumber || parsed.lessonNum || 'X') + ' | ' + lessonData.topic + '</h1>\n<h2>1. Topic</h2><p>...</p>\n<h2>2. Objective</h2><ul>...</ul>\n<h2>3. Lesson Type</h2><p>...</p>\n<h2>4. Equipment</h2><ul>...</ul>\n<h2>5. Competencies</h2><ul>...</ul>\n<h2>6. Lesson Flow</h2>\n<h3>I. Organizational moment (2 min)</h3><p>...</p>\n<h3>II. Knowledge activation (5 min)</h3><p>...</p>\n<h3>III. Motivation (3 min)</h3><p>...</p>\n<h3>IV. New material (20 min)</h3><p>...</p>\n<h3>V. Reinforcement (10 min)</h3><p>...</p>\n<h3>VI. Lesson summary (3 min)</h3><p>...</p>\n<h3>VII. Homework (2 min)</h3><p>...</p>\n<h2>7. Additional Materials</h2><p>...</p>\nReturn ONLY HTML content (no DOCTYPE, html, head, body), starting with <h1>.';
+
+        var methodistPrompt = isUkrainian
+            ? ('Ти — досвідчений методист з географії. Створи детальний, професійний конспект уроку для ' + parsed.classGrade + ' класу (вік 12-13 років).\n\nДані з КТП:\n- Тема: ' + lessonData.topic + '\n- Мета: ' + lessonData.objective + '\n- Тип уроку: ' + lessonData.type + '\n- Обладнання: ' + (lessonData.equipment || 'атлас, підручник, контурна карта') + '\n- Компетенції: ' + (lessonData.competencies || 'предметні') + '\n- Тривалість: ' + (lessonData.duration || '45 хвилин') + '\n\nВИМОГИ ДО КОНСПЕКТУ:\n1. Повна структура з таймінгом кожного етапу\n2. Конкретні питання до учнів, очікувані відповіді\n3. Інтерактивні елементи: робота в парах, міні-дослідження, цікаві факти\n4. Адаптація під вік ' + parsed.classGrade + ' класу (доступна мова, але без спрощення змісту)\n5. Обов\'язкові елементи: географічна номенклатура, робота з картою, практичні завдання\n\nФОРМАТ: HTML. Використовуй тільки ці теги: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nСТРУКТУРА (ВСЕ УКРАЇНСЬКОЮ МОВОЮ):\n<h1>Конспект уроку №' + (lessonData.lessonNumber || parsed.lessonNum || 'X') + ' з географії | ' + lessonData.topic + '</h1>\n<h2>1. Тема уроку</h2><p>...</p>\n<h2>2. Мета уроку</h2><ul>...</ul>\n<h2>3. Тип уроку</h2><p>...</p>\n<h2>4. Обладнання та наочність</h2><ul>...</ul>\n<h2>5. Компетенції, що формуються</h2><ul>...</ul>\n<h2>6. Хід уроку</h2>\n<h3>І. Організаційний момент (2 хв)</h3><p>Дії вчителя... Дії учнів...</p>\n<h3>ІІ. Актуалізація опорних знань (5 хв)</h3><p>Запитання, фронтальна перевірка...</p>\n<h3>ІІІ. Мотивація навчальної діяльності (3 хв)</h3><p>Проблемне питання, цікавий факт...</p>\n<h3>IV. Вивчення нового матеріалу (20 хв)</h3><p>Основний зміст з поясненнями, робота з картою, таблицями...</p>\n<h3>V. Закріплення вивченого (10 хв)</h3><p>Практичні завдання, тести, робота в групах...</p>\n<h3>VI. Підсумок уроку (3 хв)</h3><p>Рефлексія, оцінювання...</p>\n<h3>VII. Домашнє завдання (2 хв)</h3><p>Конкретне ДЗ з підручника + творче завдання...</p>\n<h2>7. Додаткові матеріали</h2><p>Таблиця, схема, або додаткові факти...</p>\n\nВАЖЛИВО: Увесь текст конспекту має бути УКРАЇНСЬКОЮ МОВОЮ. Заголовки, питання, пояснення — все українською.\nПоверни ТІЛЬКИ HTML-контент (без <!DOCTYPE>, <html>, <head>, <body>), починаючи з <h1>.')
+            : ('You are an experienced geography methodologist. Create a detailed, professional lesson plan for grade ' + parsed.classGrade + ' (age 12-13).\n\nData from KTP:\n- Topic: ' + lessonData.topic + '\n- Objective: ' + lessonData.objective + '\n- Type: ' + lessonData.type + '\n- Equipment: ' + (lessonData.equipment || 'atlas, textbook, contour map') + '\n- Competencies: ' + (lessonData.competencies || 'subject') + '\n- Duration: ' + (lessonData.duration || '45 minutes') + '\n\nREQUIREMENTS:\n1. Full structure with timing for each stage\n2. Specific questions for students, expected answers\n3. Interactive elements: pair work, mini-research, interesting facts\n4. Adaptation for age ' + parsed.classGrade + ' (accessible language but no content simplification)\n5. Mandatory: geographical nomenclature, map work, practical tasks\n\nFORMAT: HTML. Use only these tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nSTRUCTURE (ALL IN ENGLISH):\n<h1>Lesson Plan #' + (lessonData.lessonNumber || parsed.lessonNum || 'X') + ' | ' + lessonData.topic + '</h1>\n<h2>1. Topic</h2><p>...</p>\n<h2>2. Objective</h2><ul>...</ul>\n<h2>3. Lesson Type</h2><p>...</p>\n<h2>4. Equipment</h2><ul>...</ul>\n<h2>5. Competencies</h2><ul>...</ul>\n<h2>6. Lesson Flow</h2>\n<h3>I. Organizational moment (2 min)</h3><p>...</p>\n<h3>II. Knowledge activation (5 min)</h3><p>...</p>\n<h3>III. Motivation (3 min)</h3><p>...</p>\n<h3>IV. New material (20 min)</h3><p>...</p>\n<h3>V. Reinforcement (10 min)</h3><p>...</p>\n<h3>VI. Lesson summary (3 min)</h3><p>...</p>\n<h3>VII. Homework (2 min)</h3><p>...</p>\n<h2>7. Additional Materials</h2><p>...</p>\n\nIMPORTANT: All text must be in ENGLISH. Headers, questions, explanations — everything in English.\nReturn ONLY HTML content (no DOCTYPE, html, head, body), starting with <h1>.');
+
         var konspektHtml = await this.gemini.generate(methodistPrompt, 0.4);
         addLog('METHODIST', t('methodistDone'));
         addLog('METHODIST', t('methodistLength') + ' ' + konspektHtml.length + ' ' + t('chars'));
@@ -876,7 +894,6 @@ class Orchestrator {
         };
     }
 }
-
 async function startGeneration() {
     if (state.isProcessing) return;
     if (!state.transcript) {
