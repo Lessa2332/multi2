@@ -2,1008 +2,943 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>КонспектоГен — Мультиагентний помічник вчителя</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#05070a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Conspetto — AI Teacher Assistant</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0b0f19;
-            --surface: #111827;
-            --surface-light: #1f2937;
-            --border: #374151;
-            --text: #f3f4f6;
-            --text-muted: #9ca3af;
+            --bg: #05070a;
+            --surface: rgba(255,255,255,0.03);
+            --surface-hover: rgba(255,255,255,0.06);
+            --glass: rgba(255,255,255,0.07);
+            --glass-border: rgba(255,255,255,0.1);
+            --glass-strong: rgba(255,255,255,0.12);
+            --text: #f0f2f5;
+            --text-muted: #8b92a8;
+            --text-dim: #5a6078;
+            --gold: #d4af37;
+            --gold-light: #f0d878;
+            --gold-glow: rgba(212,175,55,0.25);
             --accent: #0ea5e9;
-            --accent-glow: rgba(14, 165, 233, 0.3);
+            --accent-glow: rgba(14,165,233,0.2);
             --success: #10b981;
+            --success-glow: rgba(16,185,129,0.2);
             --warning: #f59e0b;
             --danger: #ef4444;
             --agent-analyst: #f59e0b;
             --agent-methodist: #10b981;
-            --agent-designer: #8b5cf6;
+            --agent-designer: #a78bfa;
+            --radius: 20px;
+            --radius-sm: 12px;
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --shadow-gold: 0 4px 24px rgba(212,175,55,0.15);
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; }
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 24px;
+        .bg-mesh {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(14,165,233,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.04) 0%, transparent 60%);
+            animation: meshMove 20s ease-in-out infinite alternate;
         }
-
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 40px 0 30px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 30px;
+        @keyframes meshMove {
+            0% { transform: scale(1) rotate(0deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
         }
-
+        .container { max-width: 860px; margin: 0 auto; padding: 16px; }
+        .header { text-align: center; padding: 32px 0 24px; position: relative; }
+        .header-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 14px; background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 50px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--gold); margin-bottom: 16px;
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+        }
         .header h1 {
-            font-size: 2.2rem;
-            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 8px;
+            font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 5vw, 2.6rem);
+            font-weight: 700; background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, #b8941f 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 8px; letter-spacing: -0.02em;
         }
-
-        .header p {
-            color: var(--text-muted);
-            font-size: 1rem;
+        .header p { color: var(--text-muted); font-size: 0.95rem; max-width: 480px; margin: 0 auto; line-height: 1.5; }
+        .lang-bar {
+            position: fixed; top: 16px; right: 16px; z-index: 100; display: flex; gap: 4px;
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 50px;
+            padding: 4px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 12px;
+        .lang-btn {
+            padding: 6px 14px; border: none; background: transparent; color: var(--text-muted);
+            font-size: 0.8rem; font-weight: 600; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s; font-family: inherit;
         }
-
-        .badge-free {
-            background: rgba(16, 185, 129, 0.15);
-            color: var(--success);
-            border: 1px solid rgba(16, 185, 129, 0.3);
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--gold), #b8941f); color: #000; box-shadow: var(--shadow-gold);
         }
-
-        /* Cards */
         .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius);
+            padding: 24px; margin-bottom: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            transition: all 0.3s ease; position: relative; overflow: hidden;
         }
-
+        .card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
+        }
         .card:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px var(--accent-glow);
+            border-color: rgba(212,175,55,0.2); box-shadow: var(--shadow-gold); transform: translateY(-2px);
         }
-
         .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            font-size: 1.05rem; font-weight: 600; margin-bottom: 18px;
+            display: flex; align-items: center; gap: 10px; color: var(--text);
         }
-
-        /* Settings */
-        .settings-grid {
-            display: grid;
-            gap: 16px;
+        .card-title .icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(212,175,55,0.05));
+            display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+            border: 1px solid rgba(212,175,55,0.15);
         }
-
+        .settings-grid { display: grid; gap: 16px; }
         .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-weight: 500;
+            display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;
+            font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .input-group input {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--surface-light);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text);
-            font-size: 0.95rem;
-            transition: all 0.2s;
+            width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
+            color: var(--text); font-size: 0.95rem; transition: all 0.3s; font-family: inherit;
         }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
-        .input-group small {
-            display: block;
-            margin-top: 4px;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
+        .input-group input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+        .input-group input::placeholder { color: var(--text-dim); }
+        .input-group small { display: block; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; }
+        .input-group small a { color: var(--gold); text-decoration: none; }
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: white;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 14px 28px; border: none; border-radius: var(--radius-sm); font-size: 0.95rem;
+            font-weight: 600; cursor: pointer; transition: all 0.3s; color: white; font-family: inherit;
+            position: relative; overflow: hidden;
         }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        .btn::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); opacity: 0; transition: opacity 0.3s;
         }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px var(--accent-glow);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        .btn-google {
-            background: #fff;
-            color: #444;
-            border: 1px solid #ddd;
-        }
-
-        .btn-google:hover {
-            background: #f8f9fa;
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-
-        .btn-full {
-            width: 100%;
-        }
-
-        /* Status */
+        .btn:hover::after { opacity: 1; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold), #b8941f); color: #000; box-shadow: var(--shadow-gold); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 30px rgba(212,175,55,0.3); }
+        .btn-success { background: linear-gradient(135deg, var(--success), #059669); box-shadow: 0 4px 20px var(--success-glow); }
+        .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(16,185,129,0.35); }
+        .btn-google { background: #fff; color: #333; border: 1px solid #e0e0e0; }
+        .btn-google:hover { background: #f8f9fa; transform: translateY(-2px); }
+        .btn-ghost { background: var(--surface-hover); border: 1px solid var(--glass-border); color: var(--text-muted); padding: 10px 18px; font-size: 0.85rem; }
+        .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+        .btn-full { width: 100%; }
         .status-bar {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            background: var(--surface-light);
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
+            display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+            background: var(--surface); border-radius: var(--radius-sm); margin-bottom: 20px;
+            font-size: 0.9rem; border: 1px solid var(--glass-border);
         }
-
         .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--danger);
-            box-shadow: 0 0 8px var(--danger);
-            transition: all 0.3s;
+            width: 10px; height: 10px; border-radius: 50%; background: var(--danger);
+            box-shadow: 0 0 10px var(--danger); transition: all 0.3s; flex-shrink: 0;
         }
-
-        .status-dot.active {
-            background: var(--success);
-            box-shadow: 0 0 8px var(--success);
-        }
-
-        .status-dot.pending {
-            background: var(--warning);
-            box-shadow: 0 0 8px var(--warning);
-        }
-
-        /* Voice Button */
-        .voice-section {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
+        .status-dot.active { background: var(--success); box-shadow: 0 0 10px var(--success); }
+        .status-dot.pending { background: var(--warning); box-shadow: 0 0 10px var(--warning); }
+        .status-text { flex: 1; color: var(--text-muted); }
+        .token-timer { font-size: 0.75rem; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+        .voice-section { text-align: center; padding: 32px 16px; }
         .mic-btn {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 3px solid var(--accent);
-            background: var(--surface);
-            color: var(--accent);
-            font-size: 2.5rem;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s;
+            width: 110px; height: 110px; border-radius: 50%; border: 2px solid var(--gold);
+            background: linear-gradient(135deg, rgba(212,175,55,0.1), rgba(212,175,55,0.02));
+            color: var(--gold); font-size: 2.2rem; cursor: pointer; position: relative;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto;
         }
-
         .mic-btn:hover {
-            background: var(--accent);
-            color: white;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05));
+            transform: scale(1.08); box-shadow: 0 0 40px var(--gold-glow);
         }
-
         .mic-btn.recording {
-            background: var(--danger);
-            border-color: var(--danger);
-            color: white;
-            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));
+            border-color: var(--danger); color: var(--danger); animation: pulseRecord 2s infinite;
         }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-            50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+        @keyframes pulseRecord {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
+            50% { box-shadow: 0 0 0 25px rgba(239,68,68,0); }
         }
-
-        .voice-hint {
-            margin-top: 16px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
+        .voice-hint { margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+        .voice-hint em { color: var(--gold); font-style: normal; }
         .voice-transcript {
-            margin-top: 20px;
-            padding: 16px;
-            background: var(--surface-light);
-            border-radius: 12px;
-            border-left: 3px solid var(--accent);
-            font-style: italic;
-            color: var(--text-muted);
-            min-height: 50px;
-            display: none;
+            margin-top: 20px; padding: 16px 20px; background: var(--surface); border-radius: var(--radius-sm);
+            border-left: 3px solid var(--gold); font-style: italic; color: var(--text-muted);
+            min-height: 50px; display: none; text-align: left; font-size: 0.95rem;
         }
-
-        .voice-transcript.visible {
-            display: block;
-        }
-
-        /* Agent Log */
+        .voice-transcript.visible { display: block; }
         .agent-log {
-            background: var(--surface-light);
-            border-radius: 12px;
-            padding: 16px;
-            max-height: 400px;
-            overflow-y: auto;
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 0.85rem;
-            line-height: 1.8;
+            background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); padding: 16px;
+            max-height: 360px; overflow-y: auto; font-family: 'SF Mono', 'Consolas', monospace;
+            font-size: 0.82rem; line-height: 1.9; border: 1px solid var(--glass-border);
         }
-
+        .agent-log::-webkit-scrollbar { width: 6px; }
+        .agent-log::-webkit-scrollbar-track { background: transparent; }
+        .agent-log::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
         .log-entry {
-            padding: 6px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            animation: fadeIn 0.3s ease;
+            padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.03);
+            animation: fadeIn 0.4s ease; display: flex; align-items: flex-start; gap: 8px;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .log-time {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            margin-right: 8px;
-        }
-
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+        .log-time { color: var(--text-dim); font-size: 0.7rem; white-space: nowrap; padding-top: 2px; }
         .log-agent {
-            font-weight: 600;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            margin-right: 8px;
+            font-weight: 600; padding: 2px 8px; border-radius: 4px; font-size: 0.68rem;
+            text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; flex-shrink: 0;
         }
-
-        .log-agent-analyst { background: rgba(245, 158, 11, 0.15); color: var(--agent-analyst); }
-        .log-agent-methodist { background: rgba(16, 185, 129, 0.15); color: var(--agent-methodist); }
-        .log-agent-designer { background: rgba(139, 92, 246, 0.15); color: var(--agent-designer); }
-        .log-agent-system { background: rgba(14, 165, 233, 0.15); color: var(--accent); }
-        .log-agent-error { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
-
-        /* Result */
+        .log-agent-analyst { background: rgba(245,158,11,0.12); color: var(--agent-analyst); }
+        .log-agent-methodist { background: rgba(16,185,129,0.12); color: var(--agent-methodist); }
+        .log-agent-designer { background: rgba(167,139,250,0.12); color: var(--agent-designer); }
+        .log-agent-system { background: rgba(14,165,233,0.12); color: var(--accent); }
+        .log-agent-error { background: rgba(239,68,68,0.12); color: var(--danger); }
+        .log-msg { color: var(--text-muted); word-break: break-word; }
         .result-card {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
-            border: 1px solid var(--success);
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            display: none;
+            background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(14,165,233,0.06));
+            border: 1px solid rgba(16,185,129,0.25); border-radius: var(--radius);
+            padding: 32px 24px; text-align: center; display: none;
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: relative; overflow: hidden;
         }
-
-        .result-card.visible {
-            display: block;
-            animation: slideUp 0.5s ease;
+        .result-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(16,185,129,0.4), transparent);
         }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .result-icon {
-            font-size: 3rem;
-            margin-bottom: 12px;
-        }
-
-        .result-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
+        .result-card.visible { display: block; animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        .result-icon { font-size: 3rem; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(16,185,129,0.3)); }
+        .result-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
         .result-link {
-            display: inline-block;
-            margin-top: 16px;
-            padding: 12px 24px;
-            background: var(--success);
-            color: white;
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.2s;
+            display: inline-block; margin-top: 20px; padding: 14px 28px;
+            background: linear-gradient(135deg, var(--success), #059669); color: white;
+            text-decoration: none; border-radius: var(--radius-sm); font-weight: 600;
+            transition: all 0.3s; box-shadow: 0 4px 20px var(--success-glow);
         }
-
-        .result-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
-        }
-
-        .result-meta {
-            margin-top: 12px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* Preview */
-        .preview-section {
-            margin-top: 20px;
-            display: none;
-        }
-
-        .preview-section.visible {
-            display: block;
-        }
-
+        .result-link:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(16,185,129,0.35); }
+        .result-meta { margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); }
+        .preview-section { margin-top: 16px; display: none; }
+        .preview-section.visible { display: block; }
         .preview-frame {
-            width: 100%;
-            height: 400px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            overflow: auto;
-            padding: 20px;
-            color: #333;
+            width: 100%; height: 400px; background: #fff; border-radius: var(--radius-sm);
+            border: 1px solid var(--glass-border); overflow: auto; padding: 24px;
+            color: #1a1a2e; font-family: 'Georgia', serif; line-height: 1.7;
         }
-
-        .preview-frame h1 { color: #111; font-size: 1.5rem; margin-bottom: 12px; }
-        .preview-frame h2 { color: #222; font-size: 1.2rem; margin: 16px 0 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
-        .preview-frame h3 { color: #333; font-size: 1rem; margin: 12px 0 6px; }
-        .preview-frame p { margin-bottom: 8px; }
-        .preview-frame ul { margin-left: 20px; margin-bottom: 8px; }
-        .preview-frame table { border-collapse: collapse; width: 100%; margin: 12px 0; }
-        .preview-frame td, .preview-frame th { border: 1px solid #ddd; padding: 8px; }
-        .preview-frame th { background: #f5f5f5; }
-
-        /* Spinner */
+        .preview-frame h1 { color: #0f172a; font-size: 1.6rem; margin-bottom: 16px; font-weight: 700; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .preview-frame h2 { color: #1e293b; font-size: 1.2rem; margin: 20px 0 10px; font-weight: 600; }
+        .preview-frame h3 { color: #334155; font-size: 1.05rem; margin: 14px 0 8px; font-weight: 600; }
+        .preview-frame p { margin-bottom: 10px; }
+        .preview-frame ul { margin-left: 24px; margin-bottom: 10px; }
+        .preview-frame table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 0.9rem; }
+        .preview-frame td, .preview-frame th { border: 1px solid #cbd5e1; padding: 10px; }
+        .preview-frame th { background: #f1f5f9; font-weight: 600; }
+        .ktp-list {
+            max-height: 240px; overflow-y: auto; background: rgba(0,0,0,0.15);
+            border-radius: var(--radius-sm); padding: 8px; margin-top: 12px; border: 1px solid var(--glass-border);
+        }
+        .ktp-item {
+            padding: 12px 14px; border-radius: 10px; cursor: pointer; transition: all 0.25s;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 4px; border: 1px solid transparent;
+        }
+        .ktp-item:hover { background: rgba(212,175,55,0.08); border-color: rgba(212,175,55,0.15); }
+        .ktp-item.selected { background: rgba(212,175,55,0.12); border-color: var(--gold); box-shadow: 0 0 16px rgba(212,175,55,0.1); }
+        .ktp-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .ktp-info { flex: 1; min-width: 0; }
+        .ktp-name { font-weight: 500; font-size: 0.9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ktp-type { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
         .spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
+            border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite;
         }
-
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Hidden */
         .hidden { display: none !important; }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .header h1 { font-size: 1.6rem; }
-            .container { padding: 16px; }
-            .card { padding: 16px; }
+        @media (max-width: 640px) {
+            .container { padding: 12px; }
+            .card { padding: 18px; border-radius: 16px; }
+            .header h1 { font-size: 1.7rem; }
+            .header { padding: 24px 0 16px; }
+            .mic-btn { width: 90px; height: 90px; font-size: 1.8rem; }
+            .voice-section { padding: 24px 8px; }
+            .preview-frame { height: 300px; padding: 16px; }
+            .lang-bar { top: 8px; right: 8px; }
         }
     </style>
 <base target="_blank">
 </head>
 <body>
+    <div class="bg-mesh"></div>
+    <div class="lang-bar">
+        <button class="lang-btn active" data-lang="uk" onclick="setLang('uk')">UA</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>🎓 КонспектоГен</h1>
-            <p>Мультиагентний помічник вчителя. Голосом → Конспект на Google Диск</p>
-            <span class="badge badge-free">💎 Безкоштовно: GitHub + Gemini + Google Drive</span>
+            <div class="header-badge">&#10024; <span data-i18n="badge">AI-Powered &amp; Free Forever</span></div>
+            <h1>Conspetto</h1>
+            <p data-i18n="subtitle">Multi-agent lesson planner. Speak &rarr; Get a structured Google Doc</p>
         </div>
-
-        <!-- Settings Card -->
         <div class="card" id="settingsCard">
-            <div class="card-title">⚙️ Налаштування доступу</div>
+            <div class="card-title"><span class="icon">&#9881;&#65039;</span><span data-i18n="settingsTitle">Access Settings</span></div>
             <div class="settings-grid">
                 <div class="input-group">
-                    <label>Google OAuth Client ID</label>
+                    <label data-i18n="clientIdLabel">Google OAuth Client ID</label>
                     <input type="text" id="clientIdInput" placeholder="123456789-abc123.apps.googleusercontent.com">
-                    <small>З Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client ID</small>
+                    <small data-i18n="clientIdHint">Google Cloud Console &rarr; APIs &amp; Services &rarr; Credentials &rarr; OAuth 2.0 Client ID</small>
                 </div>
                 <div class="input-group">
-                    <label>Gemini API Key</label>
+                    <label data-i18n="geminiKeyLabel">Gemini API Key</label>
                     <input type="password" id="geminiKeyInput" placeholder="AIza...">
-                    <small>З <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent);">aistudio.google.com/apikey</a> (безкоштовно, 1500 запитів/день)</small>
+                    <small><span data-i18n="geminiKeyHint1">Get free key at</span> <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a> <span data-i18n="geminiKeyHint2">(1,500 requests/day)</span></small>
                 </div>
-                <button class="btn btn-primary btn-full" onclick="saveSettings()">💾 Зберегти налаштування</button>
+                <button class="btn btn-primary btn-full" onclick="saveSettings()">
+                    <span data-i18n="saveBtn">&#128190; Save Settings</span>
+                </button>
             </div>
         </div>
-
-        <!-- Auth Card -->
         <div class="card hidden" id="authCard">
-            <div class="card-title">🔐 Авторизація Google</div>
-            <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;">
-                Потрібен доступ до Google Диску для читання КТП та створення конспектів.
-            </p>
+            <div class="card-title"><span class="icon">&#128272;</span><span data-i18n="authTitle">Google Authorization</span></div>
+            <p style="color: var(--text-muted); margin-bottom: 18px; font-size: 0.9rem;" data-i18n="authDesc">Required to read KTP from Drive and create lesson plans.</p>
             <button class="btn btn-google btn-full" id="signInBtn" onclick="handleSignIn()">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Увійти через Google
+                <span data-i18n="signInBtn">Sign in with Google</span>
             </button>
             <div class="status-bar" style="margin-top: 16px; margin-bottom: 0;">
                 <div class="status-dot" id="authDot"></div>
-                <span id="authStatus">Не авторизовано</span>
+                <span class="status-text" id="authStatus" data-i18n="authStatus">Not authorized</span>
+                <span class="token-timer hidden" id="tokenTimer"></span>
+                <button class="btn btn-ghost hidden" id="refreshTokenBtn" onclick="refreshTokenManual()" style="padding: 6px 12px; font-size: 0.75rem;">
+                    &#128260; <span data-i18n="refreshBtn">Refresh</span>
+                </button>
             </div>
         </div>
-
-        <!-- Main Interface -->
         <div class="card hidden" id="mainCard">
-            <div class="card-title">🎙️ Голосова команда</div>
-
+            <div class="card-title"><span class="icon">&#127908;</span><span data-i18n="voiceTitle">Voice Command</span></div>
             <div class="voice-section">
-                <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎤</button>
-                <div class="voice-hint" id="voiceHint">Натисніть і скажіть: <br><em>"Сформуй конспект уроку 5, тема ГП Африки, 7 клас, з КТП"</em></div>
+                <button class="mic-btn" id="micBtn" onclick="toggleRecording()">&#127908;</button>
+                <div class="voice-hint" id="voiceHint" data-i18n="voiceHint">Tap and say:<br><em>"Create lesson plan 5, topic Africa GP, grade 7, from KTP"</em></div>
                 <div class="voice-transcript" id="transcriptBox"></div>
             </div>
-
             <button class="btn btn-success btn-full hidden" id="generateBtn" onclick="startGeneration()">
-                <span id="genBtnText">🚀 Запустити мультиагентів</span>
+                <span id="genBtnText" data-i18n="generateBtn">&#128640; Launch Multi-Agents</span>
             </button>
         </div>
-
-        <!-- Agent Log -->
+        <div class="card hidden" id="ktpSelectCard">
+            <div class="card-title"><span class="icon">&#128193;</span><span data-i18n="ktpTitle">Select KTP File</span></div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;" data-i18n="ktpDesc">Found files on your Google Drive. Select the KTP you need:</p>
+            <div class="ktp-list" id="ktpList"></div>
+            <button class="btn btn-primary btn-full" style="margin-top: 16px;" id="confirmKtpBtn" onclick="confirmKTP()" disabled>
+                <span data-i18n="confirmBtn">&#9989; Confirm Selection</span>
+            </button>
+        </div>
         <div class="card hidden" id="logCard">
-            <div class="card-title">🤖 Робота агентів</div>
+            <div class="card-title"><span class="icon">&#129302;</span><span data-i18n="logTitle">Agent Activity</span></div>
             <div class="agent-log" id="agentLog">
-                <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-agent log-agent-system">СИСТЕМА</span>Очікування команди...</div>
+                <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-agent log-agent-system" data-i18n="systemAgent">SYSTEM</span><span class="log-msg" data-i18n="waitingMsg">Waiting for command...</span></div>
             </div>
         </div>
-
-        <!-- Result -->
         <div class="result-card" id="resultCard">
-            <div class="result-icon">📄</div>
-            <div class="result-title">Конспект створено!</div>
-            <p style="color: var(--text-muted);">Документ збережено на вашому Google Диску</p>
-            <a href="#" class="result-link" id="resultLink" target="_blank">📂 Відкрити в Google Docs</a>
+            <div class="result-icon">&#128196;</div>
+            <div class="result-title" data-i18n="resultTitle">Lesson Plan Created!</div>
+            <p style="color: var(--text-muted);" data-i18n="resultDesc">Document saved to your Google Drive</p>
+            <a href="#" class="result-link" id="resultLink" target="_blank">&#128193; <span data-i18n="openDoc">Open in Google Docs</span></a>
             <div class="result-meta" id="resultMeta"></div>
         </div>
-
-        <!-- Preview -->
         <div class="preview-section" id="previewSection">
             <div class="card">
-                <div class="card-title">👁️ Попередній перегляд</div>
+                <div class="card-title"><span class="icon">&#128065;&#65039;</span><span data-i18n="previewTitle">Preview</span></div>
                 <div class="preview-frame" id="previewFrame"></div>
             </div>
         </div>
     </div>
 
-    <script>
-        // ===================== STATE =====================
-        const state = {
-            clientId: localStorage.getItem('gg_client_id') || '',
-            geminiKey: localStorage.getItem('gg_gemini_key') || '',
-            accessToken: sessionStorage.getItem('gg_access_token') || null,
-            isRecording: false,
-            transcript: '',
-            isProcessing: false,
-            tokenClient: null
-        };
 
-        // ===================== UI HELPERS =====================
-        function $(id) { return document.getElementById(id); }
+<script>
+const i18n = {
+    uk: {
+        badge: 'AI-Помічник. Безкоштовно назавжди',
+        subtitle: 'Мультиагентний планувальник уроків. Скажіть &rarr; Отримайте структурний Google Doc',
+        settingsTitle: 'Налаштування доступу', clientIdLabel: 'Google OAuth Client ID',
+        clientIdHint: 'Google Cloud Console &rarr; APIs &amp; Services &rarr; Credentials &rarr; OAuth 2.0 Client ID',
+        geminiKeyLabel: 'Gemini API Key', geminiKeyHint1: 'Отримайте безкоштовний ключ на',
+        geminiKeyHint2: '(1 500 запитів/день)', saveBtn: '&#128190; Зберегти налаштування',
+        authTitle: 'Авторизація Google', authDesc: 'Потрібен доступ до Google Диску для читання КТП та створення конспектів.',
+        signInBtn: 'Увійти через Google', authStatus: 'Не авторизовано', refreshBtn: 'Оновити',
+        voiceTitle: 'Голосова команда',
+        voiceHint: 'Натисніть і скажіть:<br><em>"Сформуй конспект уроку 5, тема ГП Африки, 7 клас, з КТП"</em>',
+        generateBtn: '&#128640; Запустити мультиагентів', ktpTitle: 'Виберіть файл КТП',
+        ktpDesc: 'Знайдено файли на вашому Google Диску. Виберіть потрібний КТП:',
+        confirmBtn: '&#9989; Підтвердити вибір', logTitle: 'Робота агентів',
+        systemAgent: 'СИСТЕМА', waitingMsg: 'Очікування команди...',
+        resultTitle: 'Конспект створено!', resultDesc: 'Документ збережено на вашому Google Диску',
+        openDoc: 'Відкрити в Google Docs', previewTitle: 'Попередній перегляд',
+        tokenExpired: '&#128273; Токен доступу закінчився. Оновлюю...',
+        tokenRefreshed: '&#128273; Токен успішно оновлено',
+        tokenRefreshFail: 'Не вдалося оновити токен. Увійдіть через Google знову.',
+        tokenValid: 'Токен дійсний ще', minutes: 'хв',
+        micListening: '&#128308; Слухаю...', micError: '&#10060; Помилка:',
+        processing: '&#9203; Обробляю...', done: '&#9989; Готово!',
+        newToken: '&#128273; Токен оновлено',
+        analystSearch: '&#128269; Шукаю КТП на Google Диску...',
+        analystFound: '&#9989; Знайдено:', analystRead: '&#128214; Зчитую файл...',
+        analystSize: '&#128202; Об\'єм даних:', analystPreview: '&#128065;&#65039; Попередній перегляд:',
+        analystAnalyze: '&#129504; Аналізую структуру уроку за допомогою Gemini...',
+        analystFoundLesson: '&#9989; Урок знайдено:', analystType: 'Тип:',
+        methodistGenerate: '&#128221; Генерую детальний конспект уроку...',
+        methodistDone: '&#9989; Конспект згенеровано', methodistLength: 'Довжина:',
+        designerCreate: '&#128196; Створюю Google Doc на Диску...',
+        designerDone: '&#9989; Документ створено на Google Диску',
+        systemReady: '&#127881; Все готово! Конспект збережено на вашому Google Диску.',
+        errorKTP: 'Файли КТП не знайдено. Завантажте КТП (Excel, Word або Google Doc) на Google Диск.',
+        errorLesson: 'Урок не знайдено в КТП. Спробуйте вказати точніший номер уроку або тему.',
+        errorToken: 'Не вдалося оновити токен. Увійдіть через Google знову.',
+        selectKTP: 'Виберіть файл КТП зі списку вище',
+        chars: 'символів', file: 'файл(ів)', updated: 'Оновлено',
+        excelSheet: 'Excel/Таблиця', document: 'Документ',
+        recognized: 'Розпізнано', lesson: 'урок', grade: 'клас', topic: 'тема', fromKTP: 'з КТП'
+    },
+    en: {
+        badge: 'AI-Powered &amp; Free Forever',
+        subtitle: 'Multi-agent lesson planner. Speak &rarr; Get a structured Google Doc',
+        settingsTitle: 'Access Settings', clientIdLabel: 'Google OAuth Client ID',
+        clientIdHint: 'Google Cloud Console &rarr; APIs &amp; Services &rarr; Credentials &rarr; OAuth 2.0 Client ID',
+        geminiKeyLabel: 'Gemini API Key', geminiKeyHint1: 'Get free key at',
+        geminiKeyHint2: '(1,500 requests/day)', saveBtn: '&#128190; Save Settings',
+        authTitle: 'Google Authorization', authDesc: 'Required to read KTP from Drive and create lesson plans.',
+        signInBtn: 'Sign in with Google', authStatus: 'Not authorized', refreshBtn: 'Refresh',
+        voiceTitle: 'Voice Command',
+        voiceHint: 'Tap and say:<br><em>"Create lesson plan 5, topic Africa GP, grade 7, from KTP"</em>',
+        generateBtn: '&#128640; Launch Multi-Agents', ktpTitle: 'Select KTP File',
+        ktpDesc: 'Found files on your Google Drive. Select the KTP you need:',
+        confirmBtn: '&#9989; Confirm Selection', logTitle: 'Agent Activity',
+        systemAgent: 'SYSTEM', waitingMsg: 'Waiting for command...',
+        resultTitle: 'Lesson Plan Created!', resultDesc: 'Document saved to your Google Drive',
+        openDoc: 'Open in Google Docs', previewTitle: 'Preview',
+        tokenExpired: '&#128273; Access token expired. Refreshing...',
+        tokenRefreshed: '&#128273; Token successfully refreshed',
+        tokenRefreshFail: 'Failed to refresh token. Please sign in with Google again.',
+        tokenValid: 'Token valid for', minutes: 'min',
+        micListening: '&#128308; Listening...', micError: '&#10060; Error:',
+        processing: '&#9203; Processing...', done: '&#9989; Done!',
+        newToken: '&#128273; Token refreshed',
+        analystSearch: '&#128269; Searching KTP on Google Drive...',
+        analystFound: '&#9989; Found:', analystRead: '&#128214; Reading file...',
+        analystSize: '&#128202; Data size:', analystPreview: '&#128065;&#65039; Preview:',
+        analystAnalyze: '&#129504; Analyzing lesson structure with Gemini...',
+        analystFoundLesson: '&#9989; Lesson found:', analystType: 'Type:',
+        methodistGenerate: '&#128221; Generating detailed lesson plan...',
+        methodistDone: '&#9989; Plan generated', methodistLength: 'Length:',
+        designerCreate: '&#128196; Creating Google Doc on Drive...',
+        designerDone: '&#9989; Document created on Google Drive',
+        systemReady: '&#127881; All done! Lesson plan saved to your Google Drive.',
+        errorKTP: 'KTP files not found. Upload KTP (Excel, Word or Google Doc) to Google Drive.',
+        errorLesson: 'Lesson not found in KTP. Try specifying a more accurate lesson number or topic.',
+        errorToken: 'Failed to refresh token. Please sign in with Google again.',
+        selectKTP: 'Select a KTP file from the list above',
+        chars: 'characters', file: 'file(s)', updated: 'Updated',
+        excelSheet: 'Excel/Sheet', document: 'Document',
+        recognized: 'Parsed', lesson: 'lesson', grade: 'grade', topic: 'topic', fromKTP: 'from KTP'
+    }
+};
 
-        function show(id) { $(id).classList.remove('hidden'); }
-        function hide(id) { $(id).classList.add('hidden'); }
+let currentLang = localStorage.getItem('conspetto_lang') || 'uk';
 
-        function addLog(agent, message) {
-            const log = $('agentLog');
-            const now = new Date().toLocaleTimeString('uk-UA');
-            const agentClass = {
-                'АНАЛІТИК': 'log-agent-analyst',
-                'МЕТОДИСТ': 'log-agent-methodist',
-                'ДИЗАЙНЕР': 'log-agent-designer',
-                'СИСТЕМА': 'log-agent-system',
-                'ПОМИЛКА': 'log-agent-error'
-            }[agent] || 'log-agent-system';
-
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `<span class="log-time">${now}</span><span class="log-agent ${agentClass}">${agent}</span>${message}`;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
-        }
-
-        function setAuthStatus(authorized, text) {
-            $('authDot').className = 'status-dot' + (authorized ? ' active' : '');
-            $('authStatus').textContent = text;
-        }
-
-        // ===================== INIT =====================
-        function init() {
-            $('clientIdInput').value = state.clientId;
-            $('geminiKeyInput').value = state.geminiKey;
-
-            if (state.clientId && state.geminiKey) {
-                hide('settingsCard');
-                show('authCard');
-                initGis();
-            }
-
-            if (state.accessToken) {
-                setAuthStatus(true, 'Авторизовано (токен активний)');
-                showMain();
-            }
-        }
-
-        function saveSettings() {
-            const clientId = $('clientIdInput').value.trim();
-            const geminiKey = $('geminiKeyInput').value.trim();
-
-            if (!clientId || !geminiKey) {
-                alert('Будь ласка, заповніть обидва поля');
-                return;
-            }
-
-            localStorage.setItem('gg_client_id', clientId);
-            localStorage.setItem('gg_gemini_key', geminiKey);
-            state.clientId = clientId;
-            state.geminiKey = geminiKey;
-
-            hide('settingsCard');
-            show('authCard');
-            initGis();
-            addLog('СИСТЕМА', 'Налаштування збережено. Увійдіть через Google.');
-        }
-
-        // ===================== GOOGLE AUTH =====================
-        function initGis() {
-            if (!window.google || !state.clientId) return;
-
-            state.tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: state.clientId,
-                scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/documents',
-                callback: (tokenResponse) => {
-                    if (tokenResponse && tokenResponse.access_token) {
-                        state.accessToken = tokenResponse.access_token;
-                        sessionStorage.setItem('gg_access_token', state.accessToken);
-                        setAuthStatus(true, 'Авторизовано ✅');
-                        showMain();
-                        addLog('СИСТЕМА', 'Google авторизація успішна. Доступ до Диску отримано.');
-                    }
-                },
-                error_callback: (err) => {
-                    console.error('GIS error:', err);
-                    addLog('ПОМИЛКА', 'Помилка авторизації: ' + (err.message || 'невідома'));
-                }
-            });
-        }
-
-        function handleSignIn() {
-            if (!state.tokenClient) {
-                alert('Спочатку збережіть налаштування з Client ID');
-                return;
-            }
-            state.tokenClient.requestAccessToken({ prompt: 'consent' });
-        }
-
-        function showMain() {
-            hide('authCard');
-            show('mainCard');
-            show('logCard');
-        }
-
-        // ===================== VOICE =====================
-        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'uk-UA';
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onresult = (e) => {
-            const text = e.results[0][0].transcript;
-            state.transcript = text;
-            $('transcriptBox').textContent = '"' + text + '"';
-            $('transcriptBox').classList.add('visible');
-            $('voiceHint').innerHTML = 'Розпізнано! Натисніть <strong>"Запустити мультиагентів"</strong>';
-            show('generateBtn');
-            addLog('СИСТЕМА', 'Голос розпізнано: ' + text);
-        };
-
-        recognition.onerror = (e) => {
-            state.isRecording = false;
-            $('micBtn').classList.remove('recording');
-            $('voiceHint').textContent = 'Помилка розпізнавання. Спробуйте ще раз.';
-            addLog('ПОМИЛКА', 'Speech recognition: ' + e.error);
-        };
-
-        recognition.onend = () => {
-            state.isRecording = false;
-            $('micBtn').classList.remove('recording');
-        };
-
-        function toggleRecording() {
-            if (state.isProcessing) return;
-
-            if (state.isRecording) {
-                recognition.stop();
-                state.isRecording = false;
-                $('micBtn').classList.remove('recording');
-            } else {
-                state.transcript = '';
-                $('transcriptBox').classList.remove('visible');
-                hide('generateBtn');
-                recognition.start();
-                state.isRecording = true;
-                $('micBtn').classList.add('recording');
-                $('voiceHint').textContent = 'Слухаю... Скажіть вашу команду';
-                addLog('СИСТЕМА', 'Мікрофон увімкнено. Очікування команди...');
-            }
-        }
-
-        // ===================== DRIVE CLIENT =====================
-        class DriveClient {
-            constructor(token) {
-                this.token = token;
-            }
-
-            async findKTP() {
-                const query = "name contains 'КТП' or name contains 'календарно' or name contains 'тематичний' or name contains 'план' or name contains 'конспект'";
-                const res = await fetch(
-                    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&pageSize=10&fields=files(id,name,mimeType,modifiedTime)`,
-                    { headers: { 'Authorization': `Bearer ${this.token}` } }
-                );
-                if (!res.ok) throw new Error('Drive API error: ' + res.status);
-                const data = await res.json();
-                return data.files || [];
-            }
-
-            async readDoc(fileId, mimeType) {
-                let url;
-                if (mimeType === 'application/vnd.google-apps.document') {
-                    url = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/plain`;
-                } else {
-                    url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-                }
-                const res = await fetch(url, {
-                    headers: { 'Authorization': `Bearer ${this.token}` }
-                });
-                if (!res.ok) throw new Error('Read error: ' + res.status);
-                return await res.text();
-            }
-
-            async createDocFromHtml(title, htmlContent) {
-                const boundary = '-------3141592653589793238462646';
-                const delimiter = "\r\n--" + boundary + "\r\n";
-                const closeDelim = "\r\n--" + boundary + "--";
-
-                const metadata = {
-                    name: title,
-                    mimeType: 'application/vnd.google-apps.document'
-                };
-
-                const multipartBody =
-                    delimiter +
-                    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
-                    JSON.stringify(metadata) +
-                    delimiter +
-                    'Content-Type: text/html; charset=UTF-8\r\n\r\n' +
-                    htmlContent +
-                    closeDelim;
-
-                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`,
-                        'Content-Type': `multipart/related; boundary="${boundary}"`
-                    },
-                    body: multipartBody
-                });
-
-                if (!res.ok) {
-                    const errText = await res.text();
-                    throw new Error('Create doc error: ' + errText);
-                }
-                return await res.json();
-            }
-        }
-
-        // ===================== GEMINI CLIENT =====================
-        class GeminiClient {
-            constructor(apiKey) {
-                this.apiKey = apiKey;
-                this.model = 'gemini-2.5-flash';
-            }
-
-            async generate(prompt, temperature = 0.3) {
-                const res = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: {
-                                temperature,
-                                maxOutputTokens: 8192,
-                                topP: 0.9
-                            }
-                        })
-                    }
-                );
-                const data = await res.json();
-                if (data.error) throw new Error(data.error.message);
-                return data.candidates[0].content.parts[0].text;
-            }
-        }
-
-        // ===================== ORCHESTRATOR =====================
-        class Orchestrator {
-            constructor(geminiKey, driveToken) {
-                this.gemini = new GeminiClient(geminiKey);
-                this.drive = new DriveClient(driveToken);
-            }
-
-            parsePrompt(text) {
-                const lessonMatch = text.match(/урок\s*[#№]?\s*(\d+)/i);
-                const classMatch = text.match(/(\d+)[\s-]*клас/i);
-                const topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i);
-                const ktpMatch = /КТП|календарно|тематичний|план/i.test(text);
-
-                return {
-                    lessonNum: lessonMatch ? parseInt(lessonMatch[1]) : null,
-                    classGrade: classMatch ? parseInt(classMatch[1]) : 7,
-                    topicHint: topicMatch ? topicMatch[1].trim() : null,
-                    useKTP: ktpMatch,
-                    raw: text
-                };
-            }
-
-            async run(transcript) {
-                const parsed = this.parsePrompt(transcript);
-                addLog('СИСТЕМА', `Розпізнано: урок №${parsed.lessonNum || '?'}, ${parsed.classGrade} клас, тема: ${parsed.topicHint || 'з КТП'}`);
-
-                // Step 1: Find KTP
-                addLog('АНАЛІТИК', '🔍 Шукаю КТП на Google Диску...');
-                const files = await this.drive.findKTP();
-                if (!files.length) throw new Error('Файли КТП не знайдено на Диску. Завантажте КТП на Google Диск.');
-
-                // Sort by recently modified, pick first
-                files.sort((a, b) => new Date(b.modifiedTime) - new Date(a.modifiedTime));
-                const ktp = files[0];
-                addLog('АНАЛІТИК', `✅ Знайдено: "${ktp.name}" (${ktp.mimeType})`);
-
-                // Step 2: Read KTP
-                addLog('АНАЛІТИК', '📖 Зчитую зміст файлу...');
-                const ktpText = await this.drive.readDoc(ktp.id, ktp.mimeType);
-                const ktpPreview = ktpText.substring(0, 20000);
-                addLog('АНАЛІТИК', `📊 Об\'єм тексту: ${ktpText.length} символів`);
-
-                // Step 3: Analyze with Gemini
-                addLog('АНАЛІТИК', '🧠 Аналізую структуру уроку за допомогою Gemini...');
-                const analysisPrompt = `
-Ти — аналітик навчальних планів. Проаналізуй текст КТП нижче та знайди урок №${parsed.lessonNum || 'вказаний'}.
-${parsed.topicHint ? `Тема уроку повинна стосуватися: "${parsed.topicHint}"` : ''}
-
-Витягни та поверни СТРОГО у форматі JSON без markdown:
-{
-  "topic": "повна тема уроку",
-  "objective": "мета уроку",
-  "type": "тип уроку (комбінований, урок нового знання, урок закріплення тощо)",
-  "equipment": "обладнання та наочність",
-  "competencies": "формування компетенцій",
-  "duration": "кількість годин",
-  "found": true,
-  "lessonNumber": ${parsed.lessonNum || 'null'}
+function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('conspetto_lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.dataset.i18n;
+        if (i18n[lang][key]) el.innerHTML = i18n[lang][key];
+    });
 }
 
-Якщо урок не знайдено, поверни {"found": false, "reason": "пояснення чому не знайдено"}
+function t(key) { return i18n[currentLang][key] || key; }
 
-Текст КТП:
-${ktpPreview}
-`;
-                const analysisText = await this.gemini.generate(analysisPrompt, 0.1);
+const state = {
+    clientId: localStorage.getItem('gg_client_id') || '',
+    geminiKey: localStorage.getItem('gg_gemini_key') || '',
+    accessToken: sessionStorage.getItem('gg_access_token') || null,
+    tokenExpiry: parseInt(sessionStorage.getItem('gg_token_expiry') || '0'),
+    isRecording: false, transcript: '', isProcessing: false,
+    tokenClient: null, ktpFiles: [], selectedKtp: null, ktpContent: ''
+};
 
-                let lessonData;
-                try {
-                    const cleanJson = analysisText.replace(/\`\`\`json|\`\`\`/g, '').trim();
-                    lessonData = JSON.parse(cleanJson);
-                } catch(e) {
-                    // Fallback: create basic structure
-                    lessonData = {
-                        found: true,
-                        topic: parsed.topicHint || 'Тема уроку',
-                        objective: 'Опанувати новий матеріал',
-                        type: 'Комбінований урок',
-                        equipment: 'Підручник, атлас, контурна карта',
-                        competencies: 'Предметні та загальнонавчальні',
-                        duration: '45 хв',
-                        lessonNumber: parsed.lessonNum
-                    };
-                }
+function $(id) { return document.getElementById(id); }
+function show(id) { $(id).classList.remove('hidden'); }
+function hide(id) { $(id).classList.add('hidden'); }
 
-                if (!lessonData.found) {
-                    throw new Error(lessonData.reason || 'Урок не знайдено в КТП');
-                }
+let tokenTimerInterval = null;
 
-                addLog('АНАЛІТИК', `✅ Урок знайдено: "${lessonData.topic}"`);
-                addLog('АНАЛІТИК', `   Тип: ${lessonData.type} | Обладнання: ${lessonData.equipment || 'не вказано'}`);
+function startTokenTimer() {
+    if (tokenTimerInterval) clearInterval(tokenTimerInterval);
+    updateTokenTimer();
+    tokenTimerInterval = setInterval(updateTokenTimer, 30000);
+}
 
-                // Step 4: Generate konspekt
-                addLog('МЕТОДИСТ', '📝 Генерую детальний конспект уроку...');
-                const methodistPrompt = `
-Ти — досвідчений методист geography. Створи детальний, професійний конспект уроку для ${parsed.classGrade} класу (вік 12-13 років).
+function updateTokenTimer() {
+    const timerEl = $('tokenTimer');
+    const refreshBtn = $('refreshTokenBtn');
+    if (!state.accessToken || !state.tokenExpiry) {
+        timerEl.classList.add('hidden');
+        refreshBtn.classList.add('hidden');
+        return;
+    }
+    const remaining = Math.max(0, state.tokenExpiry - Date.now());
+    const minutes = Math.floor(remaining / 60000);
+    if (remaining <= 0) {
+        timerEl.classList.add('hidden');
+        refreshBtn.classList.remove('hidden');
+        setAuthStatus(false, t('authStatus'));
+        state.accessToken = null;
+        sessionStorage.removeItem('gg_access_token');
+        sessionStorage.removeItem('gg_token_expiry');
+        return;
+    }
+    timerEl.textContent = t('tokenValid') + ' ' + minutes + ' ' + t('minutes');
+    timerEl.classList.remove('hidden');
+    refreshBtn.classList.remove('hidden');
+}
 
-Дані з КТП:
-- Тема: ${lessonData.topic}
-- Мета: ${lessonData.objective}
-- Тип уроку: ${lessonData.type}
-- Обладнання: ${lessonData.equipment || 'атлас, підручник, контурна карта'}
-- Компетенції: ${lessonData.competencies || 'предметні'}
-- Тривалість: ${lessonData.duration || '45 хвилин'}
+async function refreshTokenManual() {
+    addLog('SYSTEM', t('tokenExpired'));
+    const newToken = await refreshGoogleToken();
+    if (newToken) {
+        addLog('SYSTEM', t('tokenRefreshed'));
+        setAuthStatus(true, 'Authorized &#9989;');
+        startTokenTimer();
+    } else {
+        addLog('ERROR', t('tokenRefreshFail'));
+        alert(t('tokenRefreshFail'));
+    }
+}
 
-ВИМОГИ ДО КОНСПЕКТУ:
-1. Повна структура з таймінгом кожного етапу
-2. Конкретні питання до учнів, очікувані відповіді
-3. Інтерактивні елементи: робота в парах, міні-дослідження, цікаві факти
-4. Адаптація під вік ${parsed.classGrade} класу (доступна мова, але без спрощення змісту)
-5. Обов\'язкові елементи: географічна номенклатура, робота з картою, практичні завдання
+function addLog(agent, message) {
+    const log = $('agentLog');
+    const now = new Date().toLocaleTimeString(currentLang === 'uk' ? 'uk-UA' : 'en-US');
+    const agentClass = {
+        'ANALYST': 'log-agent-analyst', 'METHODIST': 'log-agent-methodist',
+        'DESIGNER': 'log-agent-designer', 'SYSTEM': 'log-agent-system', 'ERROR': 'log-agent-error'
+    }[agent] || 'log-agent-system';
+    const entry = document.createElement('div');
+    entry.className = 'log-entry';
+    entry.innerHTML = '<span class="log-time">' + now + '</span><span class="log-agent ' + agentClass + '">' + agent + '</span><span class="log-msg">' + message + '</span>';
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+}
 
-ФОРМАТ: HTML. Використовуй тільки ці теги: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.
+function setAuthStatus(authorized, text) {
+    $('authDot').className = 'status-dot' + (authorized ? ' active' : '');
+    $('authStatus').textContent = text;
+}
 
-СТРУКТУРА:
-<h1>Конспект уроку №${lessonData.lessonNumber || parsed.lessonNum || 'X'} з географії | ${lessonData.topic}</h1>
+function init() {
+    setLang(currentLang);
+    $('clientIdInput').value = state.clientId;
+    $('geminiKeyInput').value = state.geminiKey;
+    if (state.clientId && state.geminiKey) {
+        hide('settingsCard'); show('authCard'); initGis();
+    }
+    if (state.accessToken && state.tokenExpiry && Date.now() < state.tokenExpiry) {
+        setAuthStatus(true, 'Authorized &#9989;');
+        showMain(); startTokenTimer();
+    }
+}
 
-<h2>1. Тема уроку</h2>
-<p>...</p>
+function saveSettings() {
+    const clientId = $('clientIdInput').value.trim();
+    const geminiKey = $('geminiKeyInput').value.trim();
+    if (!clientId || !geminiKey) {
+        alert(currentLang === 'uk' ? 'Будь ласка, заповніть обидва поля' : 'Please fill in both fields');
+        return;
+    }
+    localStorage.setItem('gg_client_id', clientId);
+    localStorage.setItem('gg_gemini_key', geminiKey);
+    state.clientId = clientId; state.geminiKey = geminiKey;
+    hide('settingsCard'); show('authCard'); initGis();
+    addLog('SYSTEM', currentLang === 'uk' ? 'Налаштування збережено. Увійдіть через Google.' : 'Settings saved. Sign in with Google.');
+}
 
-<h2>2. Мета уроку</h2>
-<ul>...</ul>
-
-<h2>3. Тип уроку</h2>
-<p>...</p>
-
-<h2>4. Обладнання та наочність</h2>
-<ul>...</ul>
-
-<h2>5. Компетенції, що формуються</h2>
-<ul>...</ul>
-
-<h2>6. Хід уроку</h2>
-
-<h3>І. Організаційний момент (2 хв)</h3>
-<p>Дії вчителя... Дії учнів...</p>
-
-<h3>ІІ. Актуалізація опорних знань (5 хв)</h3>
-<p>Запитання, фронтальна перевірка...</p>
-
-<h3>ІІІ. Мотивація навчальної діяльності (3 хв)</h3>
-<p>Проблемне питання, цікавий факт...</p>
-
-<h3>IV. Вивчення нового матеріалу (20 хв)</h3>
-<p>Основний зміст з поясненнями, робота з картою, таблицями...</p>
-
-<h3>V. Закріплення вивченого (10 хв)</h3>
-<p>Практичні завдання, тести, робота в групах...</p>
-
-<h3>VI. Підсумок уроку (3 хв)</h3>
-<p>Рефлексія, оцінювання...</p>
-
-<h3>VII. Домашнє завдання (2 хв)</h3>
-<p>Конкретне ДЗ з підручника + творче завдання...</p>
-
-<h2>7. Додаткові матеріали</h2>
-<p>Таблиця, схема, або додаткові факти...</p>
-
-Поверни ТІЛЬКИ HTML-контент (без <!DOCTYPE>, <html>, <head>, <body>), починаючи з <h1>.
-`;
-
-                const konspektHtml = await this.gemini.generate(methodistPrompt, 0.4);
-                addLog('МЕТОДИСТ', '✅ Конспект згенеровано');
-                addLog('МЕТОДИСТ', `   Довжина: ${konspektHtml.length} символів`);
-
-                // Step 5: Create Google Doc
-                addLog('ДИЗАЙНЕР', '📄 Створюю Google Doc на Диску...');
-                const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${lessonData.topic}</title><style>body{font-family:Arial,sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:20px;color:#333}h1{color:#1a365d;border-bottom:2px solid #2b6cb0;padding-bottom:10px}h2{color:#2c5282;margin-top:24px}h3{color:#4a5568}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cbd5e0;padding:10px}th{background:#edf2f7}</style></head><body>${konspektHtml}</body></html>`;
-
-                const doc = await this.drive.createDocFromHtml(`Конспект: ${lessonData.topic}`, fullHtml);
-                addLog('ДИЗАЙНЕР', '✅ Документ створено на Google Диску');
-
-                return {
-                    docUrl: `https://docs.google.com/document/d/${doc.id}/edit`,
-                    docId: doc.id,
-                    lessonData,
-                    html: konspektHtml
-                };
+function initGis() {
+    if (!window.google || !state.clientId) return;
+    state.tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: state.clientId,
+        scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/documents',
+        callback: (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+                state.accessToken = tokenResponse.access_token;
+                state.tokenExpiry = Date.now() + (tokenResponse.expires_in || 3600) * 1000 - 300000;
+                sessionStorage.setItem('gg_access_token', state.accessToken);
+                sessionStorage.setItem('gg_token_expiry', state.tokenExpiry.toString());
+                setAuthStatus(true, 'Authorized &#9989;');
+                showMain(); startTokenTimer();
+                addLog('SYSTEM', currentLang === 'uk' ? 'Google авторизація успішна. Доступ до Диску отримано.' : 'Google authorization successful. Drive access granted.');
             }
+        },
+        error_callback: (err) => {
+            console.error('GIS error:', err);
+            addLog('ERROR', (currentLang === 'uk' ? 'Помилка авторизації: ' : 'Auth error: ') + (err.message || 'unknown'));
         }
+    });
+}
 
-        // ===================== MAIN FLOW =====================
-        async function startGeneration() {
-            if (state.isProcessing) return;
-            if (!state.transcript) {
-                alert('Спочатку скажіть команду голосом');
-                return;
+function handleSignIn() {
+    if (!state.tokenClient) {
+        alert(currentLang === 'uk' ? 'Спочатку збережіть налаштування з Client ID' : 'First save settings with Client ID');
+        return;
+    }
+    state.tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+async function refreshGoogleToken() {
+    return new Promise((resolve) => {
+        if (!state.tokenClient) { resolve(null); return; }
+        state.tokenClient.callback = (tokenResponse) => {
+            if (tokenResponse && tokenResponse.access_token) {
+                state.accessToken = tokenResponse.access_token;
+                state.tokenExpiry = Date.now() + (tokenResponse.expires_in || 3600) * 1000 - 300000;
+                sessionStorage.setItem('gg_access_token', state.accessToken);
+                sessionStorage.setItem('gg_token_expiry', state.tokenExpiry.toString());
+                resolve(state.accessToken);
+            } else { resolve(null); }
+        };
+        state.tokenClient.requestAccessToken({ prompt: '' });
+    });
+}
+
+function showMain() { hide('authCard'); show('mainCard'); show('logCard'); }
+
+const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+recognition.lang = 'uk-UA'; recognition.continuous = false; recognition.interimResults = false;
+
+recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    state.transcript = text;
+    $('transcriptBox').textContent = '"' + text + '"';
+    $('transcriptBox').classList.add('visible');
+    $('voiceHint').innerHTML = (currentLang === 'uk' ? 'Розпізнано! Натисніть <strong>"Запустити мультиагентів"</strong>' : 'Recognized! Tap <strong>"Launch Multi-Agents"</strong>');
+    show('generateBtn');
+    addLog('SYSTEM', (currentLang === 'uk' ? 'Голос розпізнано: ' : 'Voice recognized: ') + text);
+};
+
+recognition.onerror = (e) => {
+    state.isRecording = false;
+    $('micBtn').classList.remove('recording');
+    $('voiceHint').textContent = t('micError') + ' ' + e.error;
+    addLog('ERROR', 'Speech: ' + e.error);
+};
+
+recognition.onend = () => { state.isRecording = false; $('micBtn').classList.remove('recording'); };
+
+function toggleRecording() {
+    if (state.isProcessing) return;
+    if (state.isRecording) {
+        recognition.stop(); state.isRecording = false; $('micBtn').classList.remove('recording');
+    } else {
+        state.transcript = ''; $('transcriptBox').classList.remove('visible'); hide('generateBtn');
+        recognition.start(); state.isRecording = true; $('micBtn').classList.add('recording');
+        $('voiceHint').textContent = t('micListening');
+        addLog('SYSTEM', currentLang === 'uk' ? 'Мікрофон увімкнено. Очікування команди...' : 'Microphone on. Waiting for command...');
+    }
+}
+
+class DriveClient {
+    constructor(token) { this.token = token; }
+
+    async apiRequest(url, options) {
+        options = options || {};
+        var headers = options.headers || {};
+        headers['Authorization'] = 'Bearer ' + this.token;
+        options.headers = headers;
+        var res = await fetch(url, options);
+        if (res.status === 401) {
+            addLog('SYSTEM', t('tokenExpired'));
+            var newToken = await refreshGoogleToken();
+            if (newToken) {
+                this.token = newToken;
+                headers['Authorization'] = 'Bearer ' + newToken;
+                addLog('SYSTEM', t('tokenRefreshed'));
+                startTokenTimer();
+                return fetch(url, options);
             }
-
-            state.isProcessing = true;
-            $('generateBtn').disabled = true;
-            $('genBtnText').innerHTML = '<span class="spinner"></span> Агенти працюють...';
-            $('micBtn').disabled = true;
-
-            // Clear previous log
-            $('agentLog').innerHTML = '';
-            hide('resultCard');
-            hide('previewSection');
-
-            try {
-                const orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
-                const result = await orchestrator.run(state.transcript);
-
-                // Show result
-                $('resultLink').href = result.docUrl;
-                $('resultMeta').textContent = `Тема: ${result.lessonData.topic} | Тип: ${result.lessonData.type} | Урок №${result.lessonData.lessonNumber || '?'}`;
-                show('resultCard');
-
-                // Show preview
-                $('previewFrame').innerHTML = result.html;
-                show('previewSection');
-
-                addLog('СИСТЕМА', '🎉 Все готово! Конспект збережено на вашому Google Диску.');
-
-            } catch (err) {
-                console.error(err);
-                addLog('ПОМИЛКА', err.message);
-                alert('Помилка: ' + err.message);
-            } finally {
-                state.isProcessing = false;
-                $('generateBtn').disabled = false;
-                $('genBtnText').textContent = '🚀 Запустити мультиагентів';
-                $('micBtn').disabled = false;
-            }
+            throw new Error(t('errorToken'));
         }
+        return res;
+    }
 
-        // ===================== BOOT =====================
-        window.addEventListener('load', init);
-    </script>
+    async findKTP() {
+        var query = "name contains 'КТП' or name contains 'календарно' or name contains 'тематичний' or name contains 'план' or name contains 'конспект' or name contains 'програма' or name contains 'KTP' or name contains 'calendar' or name contains 'plan'";
+        var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(query) + '&pageSize=20&fields=files(id,name,mimeType,modifiedTime)');
+        if (!res.ok) throw new Error('Drive API: ' + res.status);
+        var data = await res.json();
+        return data.files || [];
+    }
+
+    async readFile(fileId, mimeType) {
+        if (mimeType === 'application/vnd.google-apps.document') {
+            var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=text/plain');
+            if (!res.ok) throw new Error('Export doc: ' + res.status);
+            return await res.text();
+        }
+        if (mimeType === 'application/vnd.google-apps.spreadsheet') {
+            var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=text/csv');
+            if (!res.ok) throw new Error('Export sheet: ' + res.status);
+            return await res.text();
+        }
+        if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
+            var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
+            if (!res.ok) throw new Error('Download xlsx: ' + res.status);
+            var ab = await res.arrayBuffer();
+            return this.parseXlsx(ab);
+        }
+        if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+            var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
+            if (!res.ok) throw new Error('Download docx: ' + res.status);
+            var ab = await res.arrayBuffer();
+            return this.parseDocxSimple(ab);
+        }
+        var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
+        if (!res.ok) throw new Error('Read: ' + res.status);
+        return await res.text();
+    }
+
+    parseXlsx(arrayBuffer) {
+        var data = new Uint8Array(arrayBuffer);
+        var workbook = XLSX.read(data, { type: 'array' });
+        var result = '';
+        workbook.SheetNames.forEach(function(sheetName) {
+            var worksheet = workbook.Sheets[sheetName];
+            var csv = XLSX.utils.sheet_to_csv(worksheet);
+            result += '\n=== Sheet: ' + sheetName + ' ===\n' + csv;
+        });
+        return result;
+    }
+
+    parseDocxSimple(arrayBuffer) {
+        var text = new TextDecoder('utf-8').decode(new Uint8Array(arrayBuffer));
+        var matches = text.match(/<w:t[^>]*>([^<]+)<\/w:t>/g);
+        if (matches) {
+            return matches.map(function(m) { return m.replace(/<\/?w:t[^>]*>/g, ''); }).join(' ');
+        }
+        return text.substring(0, 50000);
+    }
+
+    async createDocFromHtml(title, htmlContent) {
+        var boundary = '-------3141592653589793238462646';
+        var delimiter = '\r\n--' + boundary + '\r\n';
+        var closeDelim = '\r\n--' + boundary + '--';
+        var metadata = { name: title, mimeType: 'application/vnd.google-apps.document' };
+        var multipartBody = delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(metadata) +
+            delimiter + 'Content-Type: text/html; charset=UTF-8\r\n\r\n' + htmlContent + closeDelim;
+        var res = await this.apiRequest('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'multipart/related; boundary="' + boundary + '"' },
+            body: multipartBody
+        });
+        if (!res.ok) {
+            var errText = await res.text();
+            throw new Error('Create doc: ' + errText);
+        }
+        return await res.json();
+    }
+}
+
+class GeminiClient {
+    constructor(apiKey) { this.apiKey = apiKey; this.model = 'gemini-2.5-flash'; }
+    async generate(prompt, temperature) {
+        temperature = temperature || 0.3;
+        var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + this.model + ':generateContent?key=' + this.apiKey, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: { temperature: temperature, maxOutputTokens: 8192, topP: 0.9 }
+            })
+        });
+        var data = await res.json();
+        if (data.error) throw new Error(data.error.message);
+        return data.candidates[0].content.parts[0].text;
+    }
+}
+
+class Orchestrator {
+    constructor(geminiKey, driveToken) {
+        this.gemini = new GeminiClient(geminiKey);
+        this.drive = new DriveClient(driveToken);
+    }
+
+    parsePrompt(text) {
+        var lessonMatch = text.match(/урок\s*[#№]?\s*(\d+)/i) || text.match(/lesson\s*[#№]?\s*(\d+)/i);
+        var classMatch = text.match(/(\d+)[\s-]*клас/i) || text.match(/grade\s*(\d+)/i);
+        var topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i) || text.match(/topic\s+(.+?)(?:,|for|from|lesson|$)/i);
+        var ktpMatch = /КТП|календарно|тематичний|план|KTP|calendar|plan/i.test(text);
+        return {
+            lessonNum: lessonMatch ? parseInt(lessonMatch[1]) : null,
+            classGrade: classMatch ? parseInt(classMatch[1]) : 7,
+            topicHint: topicMatch ? topicMatch[1].trim() : null,
+            useKTP: ktpMatch,
+            raw: text
+        };
+    }
+
+    async findAndShowKTP() {
+        addLog('ANALYST', t('analystSearch'));
+        var files = await this.drive.findKTP();
+        if (!files.length) throw new Error(t('errorKTP'));
+        state.ktpFiles = files;
+        addLog('ANALYST', t('analystFound') + ' ' + files.length + ' ' + t('file'));
+        var list = $('ktpList');
+        list.innerHTML = '';
+        var iconMap = {
+            'application/vnd.google-apps.document': '&#128196;',
+            'application/vnd.google-apps.spreadsheet': '&#128202;',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '&#128202;',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '&#128221;',
+            'application/pdf': '&#128213;'
+        };
+        files.forEach(function(file, idx) {
+            var icon = iconMap[file.mimeType] || '&#128193;';
+            var typeLabel = (file.mimeType.includes('sheet') || file.mimeType.includes('spreadsheet')) ? t('excelSheet') : t('document');
+            var item = document.createElement('div');
+            item.className = 'ktp-item';
+            item.dataset.index = idx;
+            item.innerHTML = '<span class="ktp-icon">' + icon + '</span><div class="ktp-info"><div class="ktp-name">' + file.name + '</div><div class="ktp-type">' + typeLabel + ' | ' + t('updated') + ': ' + new Date(file.modifiedTime).toLocaleDateString(currentLang === 'uk' ? 'uk-UA' : 'en-US') + '</div></div>';
+            item.onclick = function() { selectKtpItem(idx); };
+            list.appendChild(item);
+        });
+        show('ktpSelectCard');
+    }
+
+    async runWithSelectedKTP() {
+        var parsed = this.parsePrompt(state.transcript);
+        addLog('SYSTEM', t('recognized') + ': ' + t('lesson') + ' #' + (parsed.lessonNum || '?') + ', ' + parsed.classGrade + ' ' + t('grade') + ', ' + t('topic') + ': ' + (parsed.topicHint || t('fromKTP')));
+        var ktp = state.selectedKtp;
+        addLog('ANALYST', t('analystRead') + ' "' + ktp.name + '"');
+        var ktpContent = await this.drive.readFile(ktp.id, ktp.mimeType);
+        state.ktpContent = ktpContent;
+        addLog('ANALYST', t('analystSize') + ' ' + ktpContent.length + ' ' + t('chars'));
+        var preview = ktpContent.substring(0, 500).replace(/\n/g, ' ');
+        addLog('ANALYST', t('analystPreview') + ' "' + preview + '..."');
+        var ktpPreview = ktpContent.substring(0, 25000);
+        addLog('ANALYST', t('analystAnalyze'));
+        var analysisPrompt = 'You are an analyst of school curricula. Analyze the KTP text below and find lesson #' + (parsed.lessonNum || 'specified') + '.\n' +
+            (parsed.topicHint ? 'The lesson topic should relate to: "' + parsed.topicHint + '"\n' : '') +
+            'Extract and return STRICTLY in JSON format without markdown:\n{\n  "topic": "full lesson topic",\n  "objective": "lesson objective",\n  "type": "lesson type (combined, new knowledge, reinforcement, etc.)",\n  "equipment": "equipment and visuals",\n  "competencies": "competencies being formed",\n  "duration": "number of hours",\n  "found": true,\n  "lessonNumber": ' + (parsed.lessonNum || 'null') + '\n}\nIf lesson not found, return {"found": false, "reason": "explanation"}\n\nKTP text:\n' + ktpPreview;
+        var analysisText = await this.gemini.generate(analysisPrompt, 0.1);
+        var lessonData;
+        try {
+            var cleanJson = analysisText.replace(/```json|```/g, '').trim();
+            lessonData = JSON.parse(cleanJson);
+        } catch(e) {
+            lessonData = {
+                found: true, topic: parsed.topicHint || 'Lesson Topic',
+                objective: 'Master new material', type: 'Combined lesson',
+                equipment: 'Textbook, atlas, contour map', competencies: 'Subject and general',
+                duration: '45 min', lessonNumber: parsed.lessonNum
+            };
+        }
+        if (!lessonData.found) throw new Error(lessonData.reason || t('errorLesson'));
+        addLog('ANALYST', t('analystFoundLesson') + ' "' + lessonData.topic + '"');
+        addLog('ANALYST', t('analystType') + ' ' + lessonData.type + ' | ' + (currentLang === 'uk' ? 'Обладнання' : 'Equipment') + ': ' + (lessonData.equipment || 'N/A'));
+        addLog('METHODIST', t('methodistGenerate'));
+        var methodistPrompt = 'You are an experienced geography methodologist. Create a detailed, professional lesson plan for grade ' + parsed.classGrade + ' (age 12-13).\n\nData from KTP:\n- Topic: ' + lessonData.topic + '\n- Objective: ' + lessonData.objective + '\n- Type: ' + lessonData.type + '\n- Equipment: ' + (lessonData.equipment || 'atlas, textbook, contour map') + '\n- Competencies: ' + (lessonData.competencies || 'subject') + '\n- Duration: ' + (lessonData.duration || '45 minutes') + '\n\nREQUIREMENTS:\n1. Full structure with timing for each stage\n2. Specific questions for students, expected answers\n3. Interactive elements: pair work, mini-research, interesting facts\n4. Adaptation for age ' + parsed.classGrade + ' (accessible language but no content simplification)\n5. Mandatory: geographical nomenclature, map work, practical tasks\n\nFORMAT: HTML. Use only these tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nSTRUCTURE:\n<h1>Lesson Plan #' + (lessonData.lessonNumber || parsed.lessonNum || 'X') + ' | ' + lessonData.topic + '</h1>\n<h2>1. Topic</h2><p>...</p>\n<h2>2. Objective</h2><ul>...</ul>\n<h2>3. Lesson Type</h2><p>...</p>\n<h2>4. Equipment</h2><ul>...</ul>\n<h2>5. Competencies</h2><ul>...</ul>\n<h2>6. Lesson Flow</h2>\n<h3>I. Organizational moment (2 min)</h3><p>...</p>\n<h3>II. Knowledge activation (5 min)</h3><p>...</p>\n<h3>III. Motivation (3 min)</h3><p>...</p>\n<h3>IV. New material (20 min)</h3><p>...</p>\n<h3>V. Reinforcement (10 min)</h3><p>...</p>\n<h3>VI. Lesson summary (3 min)</h3><p>...</p>\n<h3>VII. Homework (2 min)</h3><p>...</p>\n<h2>7. Additional Materials</h2><p>...</p>\nReturn ONLY HTML content (no DOCTYPE, html, head, body), starting with <h1>.';
+        var konspektHtml = await this.gemini.generate(methodistPrompt, 0.4);
+        addLog('METHODIST', t('methodistDone'));
+        addLog('METHODIST', t('methodistLength') + ' ' + konspektHtml.length + ' ' + t('chars'));
+        addLog('DESIGNER', t('designerCreate'));
+        var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + lessonData.topic + '</title><style>body{font-family:Arial,sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:20px;color:#333}h1{color:#1a365d;border-bottom:2px solid #2b6cb0;padding-bottom:10px}h2{color:#2c5282;margin-top:24px}h3{color:#4a5568}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cbd5e0;padding:10px}th{background:#edf2f7}</style></head><body>' + konspektHtml + '</body></html>';
+        var doc = await this.drive.createDocFromHtml('Conspetto: ' + lessonData.topic, fullHtml);
+        addLog('DESIGNER', t('designerDone'));
+        return {
+            docUrl: 'https://docs.google.com/document/d/' + doc.id + '/edit',
+            docId: doc.id, lessonData: lessonData, html: konspektHtml
+        };
+    }
+}
+
+async function startGeneration() {
+    if (state.isProcessing) return;
+    if (!state.transcript) {
+        alert(currentLang === 'uk' ? 'Спочатку скажіть команду голосом' : 'First speak your command');
+        return;
+    }
+    state.isProcessing = true;
+    $('generateBtn').disabled = true;
+    $('genBtnText').innerHTML = '<span class="spinner"></span> ' + (currentLang === 'uk' ? 'Агенти працюють...' : 'Agents working...');
+    $('micBtn').disabled = true;
+    $('agentLog').innerHTML = '';
+    hide('resultCard'); hide('previewSection'); hide('ktpSelectCard');
+    try {
+        var orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
+        await orchestrator.findAndShowKTP();
+    } catch (err) {
+        console.error(err);
+        addLog('ERROR', err.message);
+        alert('Error: ' + err.message);
+        resetUI();
+    }
+}
+
+function selectKtpItem(index) {
+    state.selectedKtp = state.ktpFiles[index];
+    document.querySelectorAll('.ktp-item').forEach(function(el) { el.classList.remove('selected'); });
+    document.querySelector('.ktp-item[data-index="' + index + '"]').classList.add('selected');
+    $('confirmKtpBtn').disabled = false;
+}
+
+async function confirmKTP() {
+    if (!state.selectedKtp) return;
+    hide('ktpSelectCard');
+    $('generateBtn').disabled = true;
+    $('genBtnText').innerHTML = '<span class="spinner"></span> ' + (currentLang === 'uk' ? 'Генерація конспекту...' : 'Generating plan...');
+    try {
+        var orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
+        var result = await orchestrator.runWithSelectedKTP();
+        $('resultLink').href = result.docUrl;
+        $('resultMeta').textContent = (currentLang === 'uk' ? 'Тема' : 'Topic') + ': ' + result.lessonData.topic + ' | ' + (currentLang === 'uk' ? 'Тип' : 'Type') + ': ' + result.lessonData.type + ' | ' + (currentLang === 'uk' ? 'Урок' : 'Lesson') + ' #' + (result.lessonData.lessonNumber || '?');
+        show('resultCard');
+        $('previewFrame').innerHTML = result.html;
+        show('previewSection');
+        addLog('SYSTEM', t('systemReady'));
+    } catch (err) {
+        console.error(err);
+        addLog('ERROR', err.message);
+        alert('Error: ' + err.message);
+    } finally {
+        resetUI();
+    }
+}
+
+function resetUI() {
+    state.isProcessing = false;
+    $('generateBtn').disabled = false;
+    $('genBtnText').innerHTML = '&#128640; ' + t('generateBtn').replace('&#128640; ', '');
+    $('micBtn').disabled = false;
+    $('confirmKtpBtn').disabled = true;
+}
+
+window.addEventListener('load', init);
+</script>
 </body>
 </html>
