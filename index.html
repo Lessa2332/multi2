@@ -13,69 +13,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #05070a;
-            --surface: rgba(255,255,255,0.03);
-            --surface-hover: rgba(255,255,255,0.06);
-            --glass: rgba(255,255,255,0.07);
-            --glass-border: rgba(255,255,255,0.1);
-            --glass-strong: rgba(255,255,255,0.12);
-            --text: #f0f2f5;
-            --text-muted: #8b92a8;
-            --text-dim: #5a6078;
-            --gold: #d4af37;
-            --gold-light: #f0d878;
-            --gold-glow: rgba(212,175,55,0.25);
-            --accent: #0ea5e9;
-            --accent-glow: rgba(14,165,233,0.2);
-            --success: #10b981;
-            --success-glow: rgba(16,185,129,0.2);
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --agent-analyst: #f59e0b;
-            --agent-methodist: #10b981;
-            --agent-designer: #a78bfa;
-            --radius: 20px;
-            --radius-sm: 12px;
-            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --bg: #05070a; --surface: rgba(255,255,255,0.03); --surface-hover: rgba(255,255,255,0.06);
+            --glass: rgba(255,255,255,0.07); --glass-border: rgba(255,255,255,0.1);
+            --glass-strong: rgba(255,255,255,0.12); --text: #f0f2f5; --text-muted: #8b92a8;
+            --text-dim: #5a6078; --gold: #d4af37; --gold-light: #f0d878; --gold-glow: rgba(212,175,55,0.25);
+            --accent: #0ea5e9; --accent-glow: rgba(14,165,233,0.2); --success: #10b981;
+            --success-glow: rgba(16,185,129,0.2); --warning: #f59e0b; --danger: #ef4444;
+            --agent-analyst: #f59e0b; --agent-methodist: #10b981; --agent-designer: #a78bfa;
+            --radius: 20px; --radius-sm: 12px; --shadow: 0 8px 32px rgba(0,0,0,0.4);
             --shadow-gold: 0 4px 24px rgba(212,175,55,0.15);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            line-height: 1.6;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text);
+            min-height: 100vh; line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased;
         }
         .bg-mesh {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: 
-                radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 80%, rgba(14,165,233,0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.04) 0%, transparent 60%);
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 80%, rgba(14,165,233,0.06) 0%, transparent 50%),
+                        radial-gradient(ellipse at 50% 50%, rgba(139,92,246,0.04) 0%, transparent 60%);
             animation: meshMove 20s ease-in-out infinite alternate;
         }
-        @keyframes meshMove {
-            0% { transform: scale(1) rotate(0deg); }
-            100% { transform: scale(1.1) rotate(2deg); }
-        }
+        @keyframes meshMove { 0% { transform: scale(1) rotate(0deg); } 100% { transform: scale(1.1) rotate(2deg); } }
         .container { max-width: 860px; margin: 0 auto; padding: 16px; }
         .header { text-align: center; padding: 32px 0 24px; position: relative; }
         .header-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 6px 14px; background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 50px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
-            letter-spacing: 1px; color: var(--gold); margin-bottom: 16px;
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px;
+            background: var(--glass); border: 1px solid var(--glass-border); border-radius: 50px;
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+            color: var(--gold); margin-bottom: 16px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
         }
         .header h1 {
-            font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 5vw, 2.6rem);
-            font-weight: 700; background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, #b8941f 100%);
+            font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 5vw, 2.6rem); font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 50%, #b8941f 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
             margin-bottom: 8px; letter-spacing: -0.02em;
         }
@@ -90,9 +62,7 @@
             font-size: 0.8rem; font-weight: 600; border-radius: 50px; cursor: pointer;
             transition: all 0.3s; font-family: inherit;
         }
-        .lang-btn.active {
-            background: linear-gradient(135deg, var(--gold), #b8941f); color: #000; box-shadow: var(--shadow-gold);
-        }
+        .lang-btn.active { background: linear-gradient(135deg, var(--gold), #b8941f); color: #000; box-shadow: var(--shadow-gold); }
         .card {
             background: var(--glass); border: 1px solid var(--glass-border); border-radius: var(--radius);
             padding: 24px; margin-bottom: 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
@@ -102,9 +72,7 @@
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
             background: linear-gradient(90deg, transparent, rgba(212,175,55,0.3), transparent);
         }
-        .card:hover {
-            border-color: rgba(212,175,55,0.2); box-shadow: var(--shadow-gold); transform: translateY(-2px);
-        }
+        .card:hover { border-color: rgba(212,175,55,0.2); box-shadow: var(--shadow-gold); transform: translateY(-2px); }
         .card-title {
             font-size: 1.05rem; font-weight: 600; margin-bottom: 18px;
             display: flex; align-items: center; gap: 10px; color: var(--text);
@@ -120,12 +88,12 @@
             display: block; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;
             font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .input-group input {
+        .input-group input, .input-group select {
             width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.2);
             border: 1px solid var(--glass-border); border-radius: var(--radius-sm);
             color: var(--text); font-size: 0.95rem; transition: all 0.3s; font-family: inherit;
         }
-        .input-group input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-glow); }
         .input-group input::placeholder { color: var(--text-dim); }
         .input-group small { display: block; margin-top: 6px; font-size: 0.75rem; color: var(--text-dim); line-height: 1.5; }
         .input-group small a { color: var(--gold); text-decoration: none; }
@@ -153,7 +121,7 @@
         .status-bar {
             display: flex; align-items: center; gap: 12px; padding: 14px 18px;
             background: var(--surface); border-radius: var(--radius-sm); margin-bottom: 20px;
-            font-size: 0.9rem; border: 1px solid var(--glass-border);
+            font-size: 0.9rem; border: 1px solid var(--glass-border); flex-wrap: wrap;
         }
         .status-dot {
             width: 10px; height: 10px; border-radius: 50%; background: var(--danger);
@@ -172,18 +140,9 @@
             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             display: flex; align-items: center; justify-content: center; margin: 0 auto;
         }
-        .mic-btn:hover {
-            background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05));
-            transform: scale(1.08); box-shadow: 0 0 40px var(--gold-glow);
-        }
-        .mic-btn.recording {
-            background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05));
-            border-color: var(--danger); color: var(--danger); animation: pulseRecord 2s infinite;
-        }
-        @keyframes pulseRecord {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); }
-            50% { box-shadow: 0 0 0 25px rgba(239,68,68,0); }
-        }
+        .mic-btn:hover { background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05)); transform: scale(1.08); box-shadow: 0 0 40px var(--gold-glow); }
+        .mic-btn.recording { background: linear-gradient(135deg, rgba(239,68,68,0.2), rgba(239,68,68,0.05)); border-color: var(--danger); color: var(--danger); animation: pulseRecord 2s infinite; }
+        @keyframes pulseRecord { 0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); } 50% { box-shadow: 0 0 0 25px rgba(239,68,68,0); } }
         .voice-hint { margin-top: 20px; color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
         .voice-hint em { color: var(--gold); font-style: normal; }
         .voice-transcript {
@@ -192,9 +151,24 @@
             min-height: 50px; display: none; text-align: left; font-size: 0.95rem;
         }
         .voice-transcript.visible { display: block; }
+        .batch-info {
+            background: rgba(14,165,233,0.08); border: 1px solid rgba(14,165,233,0.2);
+            border-radius: var(--radius-sm); padding: 12px 16px; margin-top: 12px;
+            font-size: 0.85rem; color: var(--accent); display: none;
+        }
+        .batch-info.visible { display: block; }
+        .progress-bar {
+            width: 100%; height: 6px; background: rgba(255,255,255,0.05);
+            border-radius: 10px; margin-top: 12px; overflow: hidden; display: none;
+        }
+        .progress-bar.visible { display: block; }
+        .progress-fill {
+            height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 10px; transition: width 0.5s ease; width: 0%;
+        }
         .agent-log {
             background: rgba(0,0,0,0.2); border-radius: var(--radius-sm); padding: 16px;
-            max-height: 360px; overflow-y: auto; font-family: 'SF Mono', 'Consolas', monospace;
+            max-height: 400px; overflow-y: auto; font-family: 'SF Mono', 'Consolas', monospace;
             font-size: 0.82rem; line-height: 1.9; border: 1px solid var(--glass-border);
         }
         .agent-log::-webkit-scrollbar { width: 6px; }
@@ -239,6 +213,14 @@
         }
         .result-link:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(16,185,129,0.35); }
         .result-meta { margin-top: 14px; font-size: 0.85rem; color: var(--text-muted); }
+        .result-links { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+        .result-link-small {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 10px 20px; background: var(--surface-hover); border: 1px solid var(--glass-border);
+            color: var(--text-muted); text-decoration: none; border-radius: var(--radius-sm);
+            font-size: 0.85rem; transition: all 0.2s;
+        }
+        .result-link-small:hover { border-color: var(--gold); color: var(--gold); }
         .preview-section { margin-top: 16px; display: none; }
         .preview-section.visible { display: block; }
         .preview-frame {
@@ -254,20 +236,22 @@
         .preview-frame table { border-collapse: collapse; width: 100%; margin: 14px 0; font-size: 0.9rem; }
         .preview-frame td, .preview-frame th { border: 1px solid #cbd5e1; padding: 10px; }
         .preview-frame th { background: #f1f5f9; font-weight: 600; }
-        .ktp-list {
+        .ktp-list, .folder-list {
             max-height: 240px; overflow-y: auto; background: rgba(0,0,0,0.15);
-            border-radius: var(--radius-sm); padding: 8px; margin-top: 12px; border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm); padding: 8px; margin-top: 12px;
+            border: 1px solid var(--glass-border);
         }
-        .ktp-item {
+        .ktp-item, .folder-item {
             padding: 12px 14px; border-radius: 10px; cursor: pointer; transition: all 0.25s;
-            display: flex; align-items: center; gap: 12px; margin-bottom: 4px; border: 1px solid transparent;
+            display: flex; align-items: center; gap: 12px; margin-bottom: 4px;
+            border: 1px solid transparent;
         }
-        .ktp-item:hover { background: rgba(212,175,55,0.08); border-color: rgba(212,175,55,0.15); }
-        .ktp-item.selected { background: rgba(212,175,55,0.12); border-color: var(--gold); box-shadow: 0 0 16px rgba(212,175,55,0.1); }
-        .ktp-icon { font-size: 1.4rem; flex-shrink: 0; }
-        .ktp-info { flex: 1; min-width: 0; }
-        .ktp-name { font-weight: 500; font-size: 0.9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .ktp-type { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
+        .ktp-item:hover, .folder-item:hover { background: rgba(212,175,55,0.08); border-color: rgba(212,175,55,0.15); }
+        .ktp-item.selected, .folder-item.selected { background: rgba(212,175,55,0.12); border-color: var(--gold); box-shadow: 0 0 16px rgba(212,175,55,0.1); }
+        .ktp-icon, .folder-icon { font-size: 1.4rem; flex-shrink: 0; }
+        .ktp-info, .folder-info { flex: 1; min-width: 0; }
+        .ktp-name, .folder-name { font-weight: 500; font-size: 0.9rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .ktp-type, .folder-type { font-size: 0.75rem; color: var(--text-dim); margin-top: 2px; }
         .spinner {
             display: inline-block; width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.2);
             border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite;
@@ -283,6 +267,7 @@
             .voice-section { padding: 24px 8px; }
             .preview-frame { height: 300px; padding: 16px; }
             .lang-bar { top: 8px; right: 8px; }
+            .status-bar { gap: 8px; }
         }
     </style>
 <base target="_blank">
@@ -297,7 +282,7 @@
         <div class="header">
             <div class="header-badge">&#10024; <span data-i18n="badge">AI-Powered &amp; Free Forever</span></div>
             <h1>Conspetto</h1>
-            <p data-i18n="subtitle">Multi-agent lesson planner. Speak &rarr; Get a structured Google Doc</p>
+            <p data-i18n="subtitle">Multi-agent lesson planner. Speak &rarr; Get structured Google Docs</p>
         </div>
         <div class="card" id="settingsCard">
             <div class="card-title"><span class="icon">&#9881;&#65039;</span><span data-i18n="settingsTitle">Access Settings</span></div>
@@ -337,8 +322,10 @@
             <div class="card-title"><span class="icon">&#127908;</span><span data-i18n="voiceTitle">Voice Command</span></div>
             <div class="voice-section">
                 <button class="mic-btn" id="micBtn" onclick="toggleRecording()">&#127908;</button>
-                <div class="voice-hint" id="voiceHint" data-i18n="voiceHint">Tap and say:<br><em>"Create lesson plan 5, topic Africa GP, grade 7, from KTP"</em></div>
+                <div class="voice-hint" id="voiceHint" data-i18n="voiceHint">Tap and say:<br><em>"Create lesson plans 5 through 8, topic Africa GP, grade 7, from KTP"</em></div>
                 <div class="voice-transcript" id="transcriptBox"></div>
+                <div class="batch-info" id="batchInfo"></div>
+                <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
             </div>
             <button class="btn btn-success btn-full hidden" id="generateBtn" onclick="startGeneration()">
                 <span id="genBtnText" data-i18n="generateBtn">&#128640; Launch Multi-Agents</span>
@@ -352,6 +339,19 @@
                 <span data-i18n="confirmBtn">&#9989; Confirm Selection</span>
             </button>
         </div>
+        <div class="card hidden" id="folderSelectCard">
+            <div class="card-title"><span class="icon">&#128194;</span><span data-i18n="folderTitle">Select Folder (Optional)</span></div>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;" data-i18n="folderDesc">Choose a folder on Drive to save lesson plans. If none selected, files go to root.</p>
+            <div class="folder-list" id="folderList"></div>
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+                <button class="btn btn-ghost" style="flex: 1;" onclick="skipFolder()">
+                    <span data-i18n="skipFolder">Skip (Root)</span>
+                </button>
+                <button class="btn btn-primary" style="flex: 2;" id="confirmFolderBtn" onclick="confirmFolder()" disabled>
+                    <span data-i18n="confirmFolderBtn">&#9989; Save to This Folder</span>
+                </button>
+            </div>
+        </div>
         <div class="card hidden" id="logCard">
             <div class="card-title"><span class="icon">&#129302;</span><span data-i18n="logTitle">Agent Activity</span></div>
             <div class="agent-log" id="agentLog">
@@ -360,9 +360,9 @@
         </div>
         <div class="result-card" id="resultCard">
             <div class="result-icon">&#128196;</div>
-            <div class="result-title" data-i18n="resultTitle">Lesson Plan Created!</div>
-            <p style="color: var(--text-muted);" data-i18n="resultDesc">Document saved to your Google Drive</p>
-            <a href="#" class="result-link" id="resultLink" target="_blank">&#128193; <span data-i18n="openDoc">Open in Google Docs</span></a>
+            <div class="result-title" data-i18n="resultTitle">Lesson Plans Created!</div>
+            <p style="color: var(--text-muted);" data-i18n="resultDesc">Documents saved to your Google Drive</p>
+            <div class="result-links" id="resultLinks"></div>
             <div class="result-meta" id="resultMeta"></div>
         </div>
         <div class="preview-section" id="previewSection">
@@ -378,7 +378,7 @@
 const i18n = {
     uk: {
         badge: 'AI-Помічник. Безкоштовно назавжди',
-        subtitle: 'Мультиагентний планувальник уроків. Скажіть &rarr; Отримайте структурний Google Doc',
+        subtitle: 'Мультиагентний планувальник уроків. Скажіть &rarr; Отримайте структурні Google Docs',
         settingsTitle: 'Налаштування доступу', clientIdLabel: 'Google OAuth Client ID',
         clientIdHint: 'Google Cloud Console &rarr; APIs &amp; Services &rarr; Credentials &rarr; OAuth 2.0 Client ID',
         geminiKeyLabel: 'Gemini API Key', geminiKeyHint1: 'Отримайте безкоштовний ключ на',
@@ -386,41 +386,44 @@ const i18n = {
         authTitle: 'Авторизація Google', authDesc: 'Потрібен доступ до Google Диску для читання КТП та створення конспектів.',
         signInBtn: 'Увійти через Google', authStatus: 'Не авторизовано', refreshBtn: 'Оновити',
         voiceTitle: 'Голосова команда',
-        voiceHint: 'Натисніть і скажіть:<br><em>"Сформуй конспект уроку 5, тема ГП Африки, 7 клас, з КТП"</em>',
+        voiceHint: 'Натисніть і скажіть:<br><em>"Сформуй конспекти уроків з 5 по 8, тема ГП Африки, 7 клас, з КТП"</em>',
         generateBtn: '&#128640; Запустити мультиагентів', ktpTitle: 'Виберіть файл КТП',
         ktpDesc: 'Знайдено файли на вашому Google Диску. Виберіть потрібний КТП:',
-        confirmBtn: '&#9989; Підтвердити вибір', logTitle: 'Робота агентів',
-        systemAgent: 'СИСТЕМА', waitingMsg: 'Очікування команди...',
-        resultTitle: 'Конспект створено!', resultDesc: 'Документ збережено на вашому Google Диску',
-        openDoc: 'Відкрити в Google Docs', previewTitle: 'Попередній перегляд',
-        tokenExpired: '&#128273; Токен доступу закінчився. Оновлюю...',
+        confirmBtn: '&#9989; Підтвердити вибір', folderTitle: 'Виберіть папку (необов\'язково)',
+        folderDesc: 'Оберіть папку на Диску для збереження конспектів. Якщо не вибрано — файли збережуться в корінь.',
+        skipFolder: 'Пропустити (Корінь)', confirmFolderBtn: '&#9989; Зберегти в цю папку',
+        logTitle: 'Робота агентів', systemAgent: 'СИСТЕМА', waitingMsg: 'Очікування команди...',
+        resultTitle: 'Конспекти створено!', resultDesc: 'Документи збережено на вашому Google Диску',
+        previewTitle: 'Попередній перегляд', tokenExpired: '&#128273; Токен доступу закінчився. Оновлюю...',
         tokenRefreshed: '&#128273; Токен успішно оновлено',
         tokenRefreshFail: 'Не вдалося оновити токен. Увійдіть через Google знову.',
-        tokenValid: 'Токен дійсний ще', minutes: 'хв',
-        micListening: '&#128308; Слухаю...', micError: '&#10060; Помилка:',
-        processing: '&#9203; Обробляю...', done: '&#9989; Готово!',
-        newToken: '&#128273; Токен оновлено',
-        analystSearch: '&#128269; Шукаю КТП на Google Диску...',
+        tokenValid: 'Токен дійсний ще', minutes: 'хв', micListening: '&#128308; Слухаю...',
+        micError: '&#10060; Помилка:', processing: '&#9203; Обробляю...', done: '&#9989; Готово!',
+        newToken: '&#128273; Токен оновлено', analystSearch: '&#128269; Шукаю КТП на Google Диску...',
         analystFound: '&#9989; Знайдено:', analystRead: '&#128214; Зчитую файл...',
         analystSize: '&#128202; Об\'єм даних:', analystPreview: '&#128065;&#65039; Попередній перегляд:',
         analystAnalyze: '&#129504; Аналізую структуру уроку за допомогою Gemini...',
         analystFoundLesson: '&#9989; Урок знайдено:', analystType: 'Тип:',
-        methodistGenerate: '&#128221; Генерую детальний конспект уроку...',
+        methodistGenerate: '&#128221; Генерую конспект уроку...',
         methodistDone: '&#9989; Конспект згенеровано', methodistLength: 'Довжина:',
         designerCreate: '&#128196; Створюю Google Doc на Диску...',
-        designerDone: '&#9989; Документ створено на Google Диску',
-        systemReady: '&#127881; Все готово! Конспект збережено на вашому Google Диску.',
+        designerDone: '&#9989; Документ створено', batchProgress: '&#128200; Прогрес:',
+        batchOf: 'з', batchDone: '&#127881; Усі конспекти готові!',
+        folderSearch: '&#128194; Шукаю папки на Диску...',
+        systemReady: '&#127881; Все готово! Конспекти збережено на вашому Google Диску.',
         errorKTP: 'Файли КТП не знайдено. Завантажте КТП (Excel, Word або Google Doc) на Google Диск.',
         errorLesson: 'Урок не знайдено в КТП. Спробуйте вказати точніший номер уроку або тему.',
         errorToken: 'Не вдалося оновити токен. Увійдіть через Google знову.',
         selectKTP: 'Виберіть файл КТП зі списку вище',
         chars: 'символів', file: 'файл(ів)', updated: 'Оновлено',
-        excelSheet: 'Excel/Таблиця', document: 'Документ',
-        recognized: 'Розпізнано', lesson: 'урок', grade: 'клас', topic: 'тема', fromKTP: 'з КТП'
+        excelSheet: 'Excel/Таблиця', document: 'Документ', folder: 'Папка',
+        recognized: 'Розпізнано', lesson: 'урок', lessons: 'уроки', grade: 'клас',
+        topic: 'тема', fromKTP: 'з КТП', range: 'діапазон', to: 'по',
+        openDoc: 'Відкрити в Google Docs'
     },
     en: {
         badge: 'AI-Powered &amp; Free Forever',
-        subtitle: 'Multi-agent lesson planner. Speak &rarr; Get a structured Google Doc',
+        subtitle: 'Multi-agent lesson planner. Speak &rarr; Get structured Google Docs',
         settingsTitle: 'Access Settings', clientIdLabel: 'Google OAuth Client ID',
         clientIdHint: 'Google Cloud Console &rarr; APIs &amp; Services &rarr; Credentials &rarr; OAuth 2.0 Client ID',
         geminiKeyLabel: 'Gemini API Key', geminiKeyHint1: 'Get free key at',
@@ -428,37 +431,40 @@ const i18n = {
         authTitle: 'Google Authorization', authDesc: 'Required to read KTP from Drive and create lesson plans.',
         signInBtn: 'Sign in with Google', authStatus: 'Not authorized', refreshBtn: 'Refresh',
         voiceTitle: 'Voice Command',
-        voiceHint: 'Tap and say:<br><em>"Create lesson plan 5, topic Africa GP, grade 7, from KTP"</em>',
+        voiceHint: 'Tap and say:<br><em>"Create lesson plans 5 through 8, topic Africa GP, grade 7, from KTP"</em>',
         generateBtn: '&#128640; Launch Multi-Agents', ktpTitle: 'Select KTP File',
         ktpDesc: 'Found files on your Google Drive. Select the KTP you need:',
-        confirmBtn: '&#9989; Confirm Selection', logTitle: 'Agent Activity',
-        systemAgent: 'SYSTEM', waitingMsg: 'Waiting for command...',
-        resultTitle: 'Lesson Plan Created!', resultDesc: 'Document saved to your Google Drive',
-        openDoc: 'Open in Google Docs', previewTitle: 'Preview',
-        tokenExpired: '&#128273; Access token expired. Refreshing...',
+        confirmBtn: '&#9989; Confirm Selection', folderTitle: 'Select Folder (Optional)',
+        folderDesc: 'Choose a folder on Drive to save lesson plans. If none selected, files go to root.',
+        skipFolder: 'Skip (Root)', confirmFolderBtn: '&#9989; Save to This Folder',
+        logTitle: 'Agent Activity', systemAgent: 'SYSTEM', waitingMsg: 'Waiting for command...',
+        resultTitle: 'Lesson Plans Created!', resultDesc: 'Documents saved to your Google Drive',
+        previewTitle: 'Preview', tokenExpired: '&#128273; Access token expired. Refreshing...',
         tokenRefreshed: '&#128273; Token successfully refreshed',
         tokenRefreshFail: 'Failed to refresh token. Please sign in with Google again.',
-        tokenValid: 'Token valid for', minutes: 'min',
-        micListening: '&#128308; Listening...', micError: '&#10060; Error:',
-        processing: '&#9203; Processing...', done: '&#9989; Done!',
-        newToken: '&#128273; Token refreshed',
-        analystSearch: '&#128269; Searching KTP on Google Drive...',
+        tokenValid: 'Token valid for', minutes: 'min', micListening: '&#128308; Listening...',
+        micError: '&#10060; Error:', processing: '&#9203; Processing...', done: '&#9989; Done!',
+        newToken: '&#128273; Token refreshed', analystSearch: '&#128269; Searching KTP on Google Drive...',
         analystFound: '&#9989; Found:', analystRead: '&#128214; Reading file...',
         analystSize: '&#128202; Data size:', analystPreview: '&#128065;&#65039; Preview:',
         analystAnalyze: '&#129504; Analyzing lesson structure with Gemini...',
         analystFoundLesson: '&#9989; Lesson found:', analystType: 'Type:',
-        methodistGenerate: '&#128221; Generating detailed lesson plan...',
+        methodistGenerate: '&#128221; Generating lesson plan...',
         methodistDone: '&#9989; Plan generated', methodistLength: 'Length:',
         designerCreate: '&#128196; Creating Google Doc on Drive...',
-        designerDone: '&#9989; Document created on Google Drive',
-        systemReady: '&#127881; All done! Lesson plan saved to your Google Drive.',
+        designerDone: '&#9989; Document created', batchProgress: '&#128200; Progress:',
+        batchOf: 'of', batchDone: '&#127881; All lesson plans ready!',
+        folderSearch: '&#128194; Searching folders on Drive...',
+        systemReady: '&#127881; All done! Lesson plans saved to your Google Drive.',
         errorKTP: 'KTP files not found. Upload KTP (Excel, Word or Google Doc) to Google Drive.',
         errorLesson: 'Lesson not found in KTP. Try specifying a more accurate lesson number or topic.',
         errorToken: 'Failed to refresh token. Please sign in with Google again.',
         selectKTP: 'Select a KTP file from the list above',
         chars: 'characters', file: 'file(s)', updated: 'Updated',
-        excelSheet: 'Excel/Sheet', document: 'Document',
-        recognized: 'Parsed', lesson: 'lesson', grade: 'grade', topic: 'topic', fromKTP: 'from KTP'
+        excelSheet: 'Excel/Sheet', document: 'Document', folder: 'Folder',
+        recognized: 'Parsed', lesson: 'lesson', lessons: 'lessons', grade: 'grade',
+        topic: 'topic', fromKTP: 'from KTP', range: 'range', to: 'to',
+        openDoc: 'Open in Google Docs'
     }
 };
 
@@ -482,7 +488,8 @@ const state = {
     accessToken: sessionStorage.getItem('gg_access_token') || null,
     tokenExpiry: parseInt(sessionStorage.getItem('gg_token_expiry') || '0'),
     isRecording: false, transcript: '', isProcessing: false,
-    tokenClient: null, ktpFiles: [], selectedKtp: null, ktpContent: ''
+    tokenClient: null, ktpFiles: [], selectedKtp: null, ktpContent: '',
+    folders: [], selectedFolder: null, batchLessons: [], batchResults: []
 };
 
 function $(id) { return document.getElementById(id); }
@@ -501,15 +508,12 @@ function updateTokenTimer() {
     const timerEl = $('tokenTimer');
     const refreshBtn = $('refreshTokenBtn');
     if (!state.accessToken || !state.tokenExpiry) {
-        timerEl.classList.add('hidden');
-        refreshBtn.classList.add('hidden');
-        return;
+        timerEl.classList.add('hidden'); refreshBtn.classList.add('hidden'); return;
     }
     const remaining = Math.max(0, state.tokenExpiry - Date.now());
     const minutes = Math.floor(remaining / 60000);
     if (remaining <= 0) {
-        timerEl.classList.add('hidden');
-        refreshBtn.classList.remove('hidden');
+        timerEl.classList.add('hidden'); refreshBtn.classList.remove('hidden');
         setAuthStatus(false, t('authStatus'));
         state.accessToken = null;
         sessionStorage.removeItem('gg_access_token');
@@ -517,8 +521,7 @@ function updateTokenTimer() {
         return;
     }
     timerEl.textContent = t('tokenValid') + ' ' + minutes + ' ' + t('minutes');
-    timerEl.classList.remove('hidden');
-    refreshBtn.classList.remove('hidden');
+    timerEl.classList.remove('hidden'); refreshBtn.classList.remove('hidden');
 }
 
 async function refreshTokenManual() {
@@ -526,11 +529,9 @@ async function refreshTokenManual() {
     const newToken = await refreshGoogleToken();
     if (newToken) {
         addLog('SYSTEM', t('tokenRefreshed'));
-        setAuthStatus(true, 'Authorized &#9989;');
-        startTokenTimer();
+        setAuthStatus(true, 'Authorized &#9989;'); startTokenTimer();
     } else {
-        addLog('ERROR', t('tokenRefreshFail'));
-        alert(t('tokenRefreshFail'));
+        addLog('ERROR', t('tokenRefreshFail')); alert(t('tokenRefreshFail'));
     }
 }
 
@@ -544,8 +545,7 @@ function addLog(agent, message) {
     const entry = document.createElement('div');
     entry.className = 'log-entry';
     entry.innerHTML = '<span class="log-time">' + now + '</span><span class="log-agent ' + agentClass + '">' + agent + '</span><span class="log-msg">' + message + '</span>';
-    log.appendChild(entry);
-    log.scrollTop = log.scrollHeight;
+    log.appendChild(entry); log.scrollTop = log.scrollHeight;
 }
 
 function setAuthStatus(authorized, text) {
@@ -557,12 +557,9 @@ function init() {
     setLang(currentLang);
     $('clientIdInput').value = state.clientId;
     $('geminiKeyInput').value = state.geminiKey;
-    if (state.clientId && state.geminiKey) {
-        hide('settingsCard'); show('authCard'); initGis();
-    }
+    if (state.clientId && state.geminiKey) { hide('settingsCard'); show('authCard'); initGis(); }
     if (state.accessToken && state.tokenExpiry && Date.now() < state.tokenExpiry) {
-        setAuthStatus(true, 'Authorized &#9989;');
-        showMain(); startTokenTimer();
+        setAuthStatus(true, 'Authorized &#9989;'); showMain(); startTokenTimer();
     }
 }
 
@@ -570,8 +567,7 @@ function saveSettings() {
     const clientId = $('clientIdInput').value.trim();
     const geminiKey = $('geminiKeyInput').value.trim();
     if (!clientId || !geminiKey) {
-        alert(currentLang === 'uk' ? 'Будь ласка, заповніть обидва поля' : 'Please fill in both fields');
-        return;
+        alert(currentLang === 'uk' ? 'Будь ласка, заповніть обидва поля' : 'Please fill in both fields'); return;
     }
     localStorage.setItem('gg_client_id', clientId);
     localStorage.setItem('gg_gemini_key', geminiKey);
@@ -591,8 +587,7 @@ function initGis() {
                 state.tokenExpiry = Date.now() + (tokenResponse.expires_in || 3600) * 1000 - 300000;
                 sessionStorage.setItem('gg_access_token', state.accessToken);
                 sessionStorage.setItem('gg_token_expiry', state.tokenExpiry.toString());
-                setAuthStatus(true, 'Authorized &#9989;');
-                showMain(); startTokenTimer();
+                setAuthStatus(true, 'Authorized &#9989;'); showMain(); startTokenTimer();
                 addLog('SYSTEM', currentLang === 'uk' ? 'Google авторизація успішна. Доступ до Диску отримано.' : 'Google authorization successful. Drive access granted.');
             }
         },
@@ -605,8 +600,7 @@ function initGis() {
 
 function handleSignIn() {
     if (!state.tokenClient) {
-        alert(currentLang === 'uk' ? 'Спочатку збережіть налаштування з Client ID' : 'First save settings with Client ID');
-        return;
+        alert(currentLang === 'uk' ? 'Спочатку збережіть налаштування з Client ID' : 'First save settings with Client ID'); return;
     }
     state.tokenClient.requestAccessToken({ prompt: 'consent' });
 }
@@ -637,14 +631,18 @@ recognition.onresult = (e) => {
     state.transcript = text;
     $('transcriptBox').textContent = '"' + text + '"';
     $('transcriptBox').classList.add('visible');
+    const parsed = parsePromptForBatch(text);
+    if (parsed.lessons.length > 1) {
+        $('batchInfo').innerHTML = '&#128200; ' + (currentLang === 'uk' ? 'Діапазон: уроки' : 'Range: lessons') + ' ' + parsed.lessons.join(', ') + ' (' + parsed.lessons.length + ' ' + (currentLang === 'uk' ? 'шт' : 'pcs') + ')';
+        $('batchInfo').classList.add('visible');
+    } else { $('batchInfo').classList.remove('visible'); }
     $('voiceHint').innerHTML = (currentLang === 'uk' ? 'Розпізнано! Натисніть <strong>"Запустити мультиагентів"</strong>' : 'Recognized! Tap <strong>"Launch Multi-Agents"</strong>');
     show('generateBtn');
     addLog('SYSTEM', (currentLang === 'uk' ? 'Голос розпізнано: ' : 'Voice recognized: ') + text);
 };
 
 recognition.onerror = (e) => {
-    state.isRecording = false;
-    $('micBtn').classList.remove('recording');
+    state.isRecording = false; $('micBtn').classList.remove('recording');
     $('voiceHint').textContent = t('micError') + ' ' + e.error;
     addLog('ERROR', 'Speech: ' + e.error);
 };
@@ -657,12 +655,44 @@ function toggleRecording() {
         recognition.stop(); state.isRecording = false; $('micBtn').classList.remove('recording');
     } else {
         state.transcript = ''; $('transcriptBox').classList.remove('visible'); hide('generateBtn');
-        recognition.start(); state.isRecording = true; $('micBtn').classList.add('recording');
-        $('voiceHint').textContent = t('micListening');
+        $('batchInfo').classList.remove('visible'); recognition.start(); state.isRecording = true;
+        $('micBtn').classList.add('recording'); $('voiceHint').textContent = t('micListening');
         addLog('SYSTEM', currentLang === 'uk' ? 'Мікрофон увімкнено. Очікування команди...' : 'Microphone on. Waiting for command...');
     }
 }
 
+// ===================== BATCH PARSING =====================
+function parsePromptForBatch(text) {
+    // Try range: "з 5 по 8", "from 5 to 8", "5 through 8"
+    let rangeMatch = text.match(/(?:з|від|from)\s*(\d+)\s*(?:по|до|to|through)\s*(\d+)/i);
+    let lessons = [];
+    if (rangeMatch) {
+        const start = parseInt(rangeMatch[1]), end = parseInt(rangeMatch[2]);
+        for (let i = Math.min(start, end); i <= Math.max(start, end); i++) lessons.push(i);
+    } else {
+        // Try list: "5, 6, 7" or single "урок 5"
+        const allNums = text.match(/\d+/g);
+        if (allNums) {
+            // If single number and no commas, it's one lesson
+            const hasComma = text.includes(',') || text.includes(' і ') || text.includes(' та ') || text.includes(' and ');
+            if (hasComma) {
+                lessons = [...new Set(allNums.map(n => parseInt(n)))].sort((a, b) => a - b);
+            } else {
+                lessons = [parseInt(allNums[0])];
+            }
+        }
+    }
+    const classMatch = text.match(/(\d+)[\s-]*клас/i) || text.match(/grade\s*(\d+)/i);
+    const topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i) || text.match(/topic\s+(.+?)(?:,|for|from|lesson|$)/i);
+    return {
+        lessons: lessons,
+        classGrade: classMatch ? parseInt(classMatch[1]) : 7,
+        topicHint: topicMatch ? topicMatch[1].trim() : null,
+        raw: text
+    };
+}
+
+// ===================== DRIVE CLIENT =====================
 class DriveClient {
     constructor(token) { this.token = token; }
 
@@ -678,8 +708,7 @@ class DriveClient {
             if (newToken) {
                 this.token = newToken;
                 headers['Authorization'] = 'Bearer ' + newToken;
-                addLog('SYSTEM', t('tokenRefreshed'));
-                startTokenTimer();
+                addLog('SYSTEM', t('tokenRefreshed')); startTokenTimer();
                 return fetch(url, options);
             }
             throw new Error(t('errorToken'));
@@ -695,32 +724,35 @@ class DriveClient {
         return data.files || [];
     }
 
+    async findFolders() {
+        var query = "mimeType='application/vnd.google-apps.folder' and trashed=false";
+        var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(query) + '&pageSize=30&fields=files(id,name,modifiedTime)&orderBy=name');
+        if (!res.ok) throw new Error('Folder API: ' + res.status);
+        var data = await res.json();
+        return data.files || [];
+    }
+
     async readFile(fileId, mimeType) {
         if (mimeType === 'application/vnd.google-apps.document') {
             var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=text/plain');
-            if (!res.ok) throw new Error('Export doc: ' + res.status);
-            return await res.text();
+            if (!res.ok) throw new Error('Export doc: ' + res.status); return await res.text();
         }
         if (mimeType === 'application/vnd.google-apps.spreadsheet') {
             var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '/export?mimeType=text/csv');
-            if (!res.ok) throw new Error('Export sheet: ' + res.status);
-            return await res.text();
+            if (!res.ok) throw new Error('Export sheet: ' + res.status); return await res.text();
         }
         if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet') {
             var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
             if (!res.ok) throw new Error('Download xlsx: ' + res.status);
-            var ab = await res.arrayBuffer();
-            return this.parseXlsx(ab);
+            var ab = await res.arrayBuffer(); return this.parseXlsx(ab);
         }
         if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
             var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
             if (!res.ok) throw new Error('Download docx: ' + res.status);
-            var ab = await res.arrayBuffer();
-            return this.parseDocxSimple(ab);
+            var ab = await res.arrayBuffer(); return this.parseDocxSimple(ab);
         }
         var res = await this.apiRequest('https://www.googleapis.com/drive/v3/files/' + fileId + '?alt=media');
-        if (!res.ok) throw new Error('Read: ' + res.status);
-        return await res.text();
+        if (!res.ok) throw new Error('Read: ' + res.status); return await res.text();
     }
 
     parseXlsx(arrayBuffer) {
@@ -744,11 +776,12 @@ class DriveClient {
         return text.substring(0, 50000);
     }
 
-    async createDocFromHtml(title, htmlContent) {
+    async createDocFromHtml(title, htmlContent, folderId) {
         var boundary = '-------3141592653589793238462646';
         var delimiter = '\r\n--' + boundary + '\r\n';
         var closeDelim = '\r\n--' + boundary + '--';
         var metadata = { name: title, mimeType: 'application/vnd.google-apps.document' };
+        if (folderId) metadata.parents = [folderId];
         var multipartBody = delimiter + 'Content-Type: application/json; charset=UTF-8\r\n\r\n' + JSON.stringify(metadata) +
             delimiter + 'Content-Type: text/html; charset=UTF-8\r\n\r\n' + htmlContent + closeDelim;
         var res = await this.apiRequest('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
@@ -771,10 +804,7 @@ class GeminiClient {
         var res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + this.model + ':generateContent?key=' + this.apiKey, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: { temperature: temperature, maxOutputTokens: 8192, topP: 0.9 }
-            })
+            body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temperature, maxOutputTokens: 8192, topP: 0.9 } })
         });
         var data = await res.json();
         if (data.error) throw new Error(data.error.message);
@@ -782,26 +812,12 @@ class GeminiClient {
     }
 }
 
-
+// ===================== ORCHESTRATOR =====================
 class Orchestrator {
     constructor(geminiKey, driveToken) {
         this.gemini = new GeminiClient(geminiKey);
         this.drive = new DriveClient(driveToken);
         this.lang = currentLang;
-    }
-
-    parsePrompt(text) {
-        var lessonMatch = text.match(/урок\s*[#№]?\s*(\d+)/i) || text.match(/lesson\s*[#№]?\s*(\d+)/i);
-        var classMatch = text.match(/(\d+)[\s-]*клас/i) || text.match(/grade\s*(\d+)/i);
-        var topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i) || text.match(/topic\s+(.+?)(?:,|for|from|lesson|$)/i);
-        var ktpMatch = /КТП|календарно|тематичний|план|KTP|calendar|plan/i.test(text);
-        return {
-            lessonNum: lessonMatch ? parseInt(lessonMatch[1]) : null,
-            classGrade: classMatch ? parseInt(classMatch[1]) : 7,
-            topicHint: topicMatch ? topicMatch[1].trim() : null,
-            useKTP: ktpMatch,
-            raw: text
-        };
     }
 
     async findAndShowKTP() {
@@ -810,21 +826,13 @@ class Orchestrator {
         if (!files.length) throw new Error(t('errorKTP'));
         state.ktpFiles = files;
         addLog('ANALYST', t('analystFound') + ' ' + files.length + ' ' + t('file'));
-        var list = $('ktpList');
-        list.innerHTML = '';
-        var iconMap = {
-            'application/vnd.google-apps.document': '&#128196;',
-            'application/vnd.google-apps.spreadsheet': '&#128202;',
-            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '&#128202;',
-            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '&#128221;',
-            'application/pdf': '&#128213;'
-        };
+        var list = $('ktpList'); list.innerHTML = '';
+        var iconMap = { 'application/vnd.google-apps.document': '&#128196;', 'application/vnd.google-apps.spreadsheet': '&#128202;', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '&#128202;', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '&#128221;', 'application/pdf': '&#128213;' };
         files.forEach(function(file, idx) {
             var icon = iconMap[file.mimeType] || '&#128193;';
             var typeLabel = (file.mimeType.includes('sheet') || file.mimeType.includes('spreadsheet')) ? t('excelSheet') : t('document');
             var item = document.createElement('div');
-            item.className = 'ktp-item';
-            item.dataset.index = idx;
+            item.className = 'ktp-item'; item.dataset.index = idx;
             item.innerHTML = '<span class="ktp-icon">' + icon + '</span><div class="ktp-info"><div class="ktp-name">' + file.name + '</div><div class="ktp-type">' + typeLabel + ' | ' + t('updated') + ': ' + new Date(file.modifiedTime).toLocaleDateString(currentLang === 'uk' ? 'uk-UA' : 'en-US') + '</div></div>';
             item.onclick = function() { selectKtpItem(idx); };
             list.appendChild(item);
@@ -832,91 +840,87 @@ class Orchestrator {
         show('ktpSelectCard');
     }
 
-    async runWithSelectedKTP() {
-        var parsed = this.parsePrompt(state.transcript);
-        addLog('SYSTEM', t('recognized') + ': ' + t('lesson') + ' #' + (parsed.lessonNum || '?') + ', ' + parsed.classGrade + ' ' + t('grade') + ', ' + t('topic') + ': ' + (parsed.topicHint || t('fromKTP')));
-        var ktp = state.selectedKtp;
-        addLog('ANALYST', t('analystRead') + ' "' + ktp.name + '"');
-        var ktpContent = await this.drive.readFile(ktp.id, ktp.mimeType);
-        state.ktpContent = ktpContent;
-        addLog('ANALYST', t('analystSize') + ' ' + ktpContent.length + ' ' + t('chars'));
-        var preview = ktpContent.substring(0, 500).replace(/\n/g, ' ');
-        addLog('ANALYST', t('analystPreview') + ' "' + preview + '..."');
-        var ktpPreview = ktpContent.substring(0, 25000);
-        addLog('ANALYST', t('analystAnalyze'));
+    async findAndShowFolders() {
+        addLog('SYSTEM', t('folderSearch'));
+        var folders = await this.drive.findFolders();
+        state.folders = folders;
+        var list = $('folderList'); list.innerHTML = '';
+        // Add "Root" option
+        var rootItem = document.createElement('div');
+        rootItem.className = 'folder-item'; rootItem.dataset.index = '-1';
+        rootItem.innerHTML = '<span class="folder-icon">&#128193;</span><div class="folder-info"><div class="folder-name">' + (currentLang === 'uk' ? 'Корінь Диску' : 'Drive Root') + '</div><div class="folder-type">' + (currentLang === 'uk' ? 'Головна папка' : 'Main folder') + '</div></div>';
+        rootItem.onclick = function() { selectFolderItem(-1); };
+        list.appendChild(rootItem);
+        folders.forEach(function(folder, idx) {
+            var item = document.createElement('div');
+            item.className = 'folder-item'; item.dataset.index = idx;
+            item.innerHTML = '<span class="folder-icon">&#128194;</span><div class="folder-info"><div class="folder-name">' + folder.name + '</div><div class="folder-type">' + t('folder') + '</div></div>';
+            item.onclick = function() { selectFolderItem(idx); };
+            list.appendChild(item);
+        });
+        show('folderSelectCard');
+    }
 
+    async generateSingleLesson(lessonNum, parsed, ktpContent, folderId) {
         var isUkrainian = this.lang === 'uk';
+        var ktpPreview = ktpContent.substring(0, 25000);
 
-        var analysisPrompt = isUkrainian 
-            ? ('Ти — аналітик навчальних планів. Проаналізуй текст КТП нижче та знайди урок №' + (parsed.lessonNum || 'вказаний') + '.\n' +
-               (parsed.topicHint ? 'Тема уроку повинна стосуватися: "' + parsed.topicHint + '"\n' : '') +
-               'Витягни та поверни СТРОГО у форматі JSON без markdown:\n{\n  "topic": "повна тема уроку",\n  "objective": "мета уроку",\n  "type": "тип уроку (комбінований, урок нового знання, урок закріплення тощо)",\n  "equipment": "обладнання та наочність",\n  "competencies": "формування компетенцій",\n  "duration": "кількість годин",\n  "found": true,\n  "lessonNumber": ' + (parsed.lessonNum || 'null') + '\n}\nЯкщо урок не знайдено, поверни {"found": false, "reason": "пояснення чому не знайдено"}\n\nТекст КТП:\n' + ktpPreview)
-            : ('You are an analyst of school curricula. Analyze the KTP text below and find lesson #' + (parsed.lessonNum || 'specified') + '.\n' +
-               (parsed.topicHint ? 'The lesson topic should relate to: "' + parsed.topicHint + '"\n' : '') +
-               'Extract and return STRICTLY in JSON format without markdown:\n{\n  "topic": "full lesson topic",\n  "objective": "lesson objective",\n  "type": "lesson type (combined, new knowledge, reinforcement, etc.)",\n  "equipment": "equipment and visuals",\n  "competencies": "competencies being formed",\n  "duration": "number of hours",\n  "found": true,\n  "lessonNumber": ' + (parsed.lessonNum || 'null') + '\n}\nIf lesson not found, return {"found": false, "reason": "explanation"}\n\nKTP text:\n' + ktpPreview);
+        var analysisPrompt = isUkrainian
+            ? ('Ти — аналітик навчальних планів. Проаналізуй текст КТП нижче та знайди урок №' + lessonNum + '.\n' + (parsed.topicHint ? 'Тема уроку повинна стосуватися: "' + parsed.topicHint + '"\n' : '') + 'Витягни та поверни СТРОГО у форматі JSON без markdown:\n{\n  "topic": "повна тема уроку",\n  "objective": "мета уроку",\n  "type": "тип уроку",\n  "equipment": "обладнання",\n  "competencies": "компетенції",\n  "duration": "тривалість",\n  "found": true,\n  "lessonNumber": ' + lessonNum + '\n}\nЯкщо урок не знайдено, поверни {"found": false, "reason": "пояснення"}\n\nТекст КТП:\n' + ktpPreview)
+            : ('You are a school curriculum analyst. Analyze the KTP text below and find lesson #' + lessonNum + '.\n' + (parsed.topicHint ? 'The lesson topic should relate to: "' + parsed.topicHint + '"\n' : '') + 'Extract and return STRICTLY in JSON without markdown:\n{\n  "topic": "full lesson topic",\n  "objective": "lesson objective",\n  "type": "lesson type",\n  "equipment": "equipment",\n  "competencies": "competencies",\n  "duration": "duration",\n  "found": true,\n  "lessonNumber": ' + lessonNum + '\n}\nIf not found, return {"found": false, "reason": "explanation"}\n\nKTP text:\n' + ktpPreview);
 
         var analysisText = await this.gemini.generate(analysisPrompt, 0.1);
         var lessonData;
-        try {
-            var cleanJson = analysisText.replace(/```json|```/g, '').trim();
-            lessonData = JSON.parse(cleanJson);
-        } catch(e) {
-            lessonData = {
-                found: true, 
-                topic: parsed.topicHint || (isUkrainian ? 'Тема уроку' : 'Lesson Topic'),
+        try { var cleanJson = analysisText.replace(/```json|```/g, '').trim(); lessonData = JSON.parse(cleanJson); }
+        catch(e) {
+            lessonData = { found: true, topic: parsed.topicHint || (isUkrainian ? 'Тема уроку ' + lessonNum : 'Lesson Topic ' + lessonNum),
                 objective: isUkrainian ? 'Опанувати новий матеріал' : 'Master new material',
                 type: isUkrainian ? 'Комбінований урок' : 'Combined lesson',
                 equipment: isUkrainian ? 'Підручник, атлас, контурна карта' : 'Textbook, atlas, contour map',
                 competencies: isUkrainian ? 'Предметні та загальнонавчальні' : 'Subject and general',
-                duration: '45 ' + (isUkrainian ? 'хв' : 'min'),
-                lessonNumber: parsed.lessonNum
-            };
+                duration: '45 ' + (isUkrainian ? 'хв' : 'min'), lessonNumber: lessonNum };
         }
         if (!lessonData.found) throw new Error(lessonData.reason || t('errorLesson'));
+
         addLog('ANALYST', t('analystFoundLesson') + ' "' + lessonData.topic + '"');
-        addLog('ANALYST', t('analystType') + ' ' + lessonData.type + ' | ' + (isUkrainian ? 'Обладнання' : 'Equipment') + ': ' + (lessonData.equipment || 'N/A'));
-        addLog('METHODIST', t('methodistGenerate'));
 
         var methodistPrompt = isUkrainian
-            ? ('Ти — досвідчений методист з географії. Створи детальний, професійний конспект уроку для ' + parsed.classGrade + ' класу (вік 12-13 років).\n\nДані з КТП:\n- Тема: ' + lessonData.topic + '\n- Мета: ' + lessonData.objective + '\n- Тип уроку: ' + lessonData.type + '\n- Обладнання: ' + (lessonData.equipment || 'атлас, підручник, контурна карта') + '\n- Компетенції: ' + (lessonData.competencies || 'предметні') + '\n- Тривалість: ' + (lessonData.duration || '45 хвилин') + '\n\nВИМОГИ ДО КОНСПЕКТУ:\n1. Повна структура з таймінгом кожного етапу\n2. Конкретні питання до учнів, очікувані відповіді\n3. Інтерактивні елементи: робота в парах, міні-дослідження, цікаві факти\n4. Адаптація під вік ' + parsed.classGrade + ' класу (доступна мова, але без спрощення змісту)\n5. Обов\'язкові елементи: географічна номенклатура, робота з картою, практичні завдання\n\nФОРМАТ: HTML. Використовуй тільки ці теги: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nСТРУКТУРА (ВСЕ УКРАЇНСЬКОЮ МОВОЮ):\n<h1>Конспект уроку №' + (lessonData.lessonNumber || parsed.lessonNum || 'X') + ' з географії | ' + lessonData.topic + '</h1>\n<h2>1. Тема уроку</h2><p>...</p>\n<h2>2. Мета уроку</h2><ul>...</ul>\n<h2>3. Тип уроку</h2><p>...</p>\n<h2>4. Обладнання та наочність</h2><ul>...</ul>\n<h2>5. Компетенції, що формуються</h2><ul>...</ul>\n<h2>6. Хід уроку</h2>\n<h3>І. Організаційний момент (2 хв)</h3><p>Дії вчителя... Дії учнів...</p>\n<h3>ІІ. Актуалізація опорних знань (5 хв)</h3><p>Запитання, фронтальна перевірка...</p>\n<h3>ІІІ. Мотивація навчальної діяльності (3 хв)</h3><p>Проблемне питання, цікавий факт...</p>\n<h3>IV. Вивчення нового матеріалу (20 хв)</h3><p>Основний зміст з поясненнями, робота з картою, таблицями...</p>\n<h3>V. Закріплення вивченого (10 хв)</h3><p>Практичні завдання, тести, робота в групах...</p>\n<h3>VI. Підсумок уроку (3 хв)</h3><p>Рефлексія, оцінювання...</p>\n<h3>VII. Домашнє завдання (2 хв)</h3><p>Конкретне ДЗ з підручника + творче завдання...</p>\n<h2>7. Додаткові матеріали</h2><p>Таблиця, схема, або додаткові факти...</p>\n\nВАЖЛИВО: Увесь текст конспекту має бути УКРАЇНСЬКОЮ МОВОЮ. Заголовки, питання, пояснення — все українською.\nПоверни ТІЛЬКИ HTML-контент (без <!DOCTYPE>, <html>, <head>, <body>), починаючи з <h1>.')
-            : ('You are an experienced geography methodologist. Create a detailed, professional lesson plan for grade ' + parsed.classGrade + ' (age 12-13).\n\nData from KTP:\n- Topic: ' + lessonData.topic + '\n- Objective: ' + lessonData.objective + '\n- Type: ' + lessonData.type + '\n- Equipment: ' + (lessonData.equipment || 'atlas, textbook, contour map') + '\n- Competencies: ' + (lessonData.competencies || 'subject') + '\n- Duration: ' + (lessonData.duration || '45 minutes') + '\n\nREQUIREMENTS:\n1. Full structure with timing for each stage\n2. Specific questions for students, expected answers\n3. Interactive elements: pair work, mini-research, interesting facts\n4. Adaptation for age ' + parsed.classGrade + ' (accessible language but no content simplification)\n5. Mandatory: geographical nomenclature, map work, practical tasks\n\nFORMAT: HTML. Use only these tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nSTRUCTURE (ALL IN ENGLISH):\n<h1>Lesson Plan #' + (lessonData.lessonNumber || parsed.lessonNum || 'X') + ' | ' + lessonData.topic + '</h1>\n<h2>1. Topic</h2><p>...</p>\n<h2>2. Objective</h2><ul>...</ul>\n<h2>3. Lesson Type</h2><p>...</p>\n<h2>4. Equipment</h2><ul>...</ul>\n<h2>5. Competencies</h2><ul>...</ul>\n<h2>6. Lesson Flow</h2>\n<h3>I. Organizational moment (2 min)</h3><p>...</p>\n<h3>II. Knowledge activation (5 min)</h3><p>...</p>\n<h3>III. Motivation (3 min)</h3><p>...</p>\n<h3>IV. New material (20 min)</h3><p>...</p>\n<h3>V. Reinforcement (10 min)</h3><p>...</p>\n<h3>VI. Lesson summary (3 min)</h3><p>...</p>\n<h3>VII. Homework (2 min)</h3><p>...</p>\n<h2>7. Additional Materials</h2><p>...</p>\n\nIMPORTANT: All text must be in ENGLISH. Headers, questions, explanations — everything in English.\nReturn ONLY HTML content (no DOCTYPE, html, head, body), starting with <h1>.');
+            ? ('Ти — досвідчений методист з географії. Створи детальний, професійний конспект уроку для ' + parsed.classGrade + ' класу (вік 12-13).\n\nДані з КТП:\n- Тема: ' + lessonData.topic + '\n- Мета: ' + lessonData.objective + '\n- Тип: ' + lessonData.type + '\n- Обладнання: ' + (lessonData.equipment || 'атлас, підручник') + '\n- Компетенції: ' + (lessonData.competencies || 'предметні') + '\n- Тривалість: ' + (lessonData.duration || '45 хв') + '\n\nВИМОГИ:\n1. Повна структура з таймінгом\n2. Конкретні питання до учнів\n3. Інтерактивні елементи\n4. Адаптація під вік ' + parsed.classGrade + ' класу\n5. Географічна номенклатура, робота з картою\n\nФОРМАТ: HTML. Теги: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nСТРУКТУРА (ВСЕ УКРАЇНСЬКОЮ):\n<h1>Конспект уроку №' + lessonNum + ' з географії | ' + lessonData.topic + '</h1>\n<h2>1. Тема уроку</h2><p>...</p>\n<h2>2. Мета уроку</h2><ul>...</ul>\n<h2>3. Тип уроку</h2><p>...</p>\n<h2>4. Обладнання та наочність</h2><ul>...</ul>\n<h2>5. Компетенції, що формуються</h2><ul>...</ul>\n<h2>6. Хід уроку</h2>\n<h3>І. Організаційний момент (2 хв)</h3><p>...</p>\n<h3>ІІ. Актуалізація опорних знань (5 хв)</h3><p>...</p>\n<h3>ІІІ. Мотивація (3 хв)</h3><p>...</p>\n<h3>IV. Вивчення нового матеріалу (20 хв)</h3><p>...</p>\n<h3>V. Закріплення (10 хв)</h3><p>...</p>\n<h3>VI. Підсумок уроку (3 хв)</h3><p>...</p>\n<h3>VII. Домашнє завдання (2 хв)</h3><p>...</p>\n<h2>7. Додаткові матеріали</h2><p>...</p>\n\nВАЖЛИВО: Увесь текст УКРАЇНСЬКОЮ МОВОЮ.\nПоверни ТІЛЬКИ HTML (без DOCTYPE, html, head, body), з <h1>.')
+            : ('You are an experienced geography methodologist. Create a detailed lesson plan for grade ' + parsed.classGrade + ' (age 12-13).\n\nData from KTP:\n- Topic: ' + lessonData.topic + '\n- Objective: ' + lessonData.objective + '\n- Type: ' + lessonData.type + '\n- Equipment: ' + (lessonData.equipment || 'atlas, textbook') + '\n- Competencies: ' + (lessonData.competencies || 'subject') + '\n- Duration: ' + (lessonData.duration || '45 min') + '\n\nREQUIREMENTS:\n1. Full structure with timing\n2. Specific questions for students\n3. Interactive elements\n4. Adaptation for age ' + parsed.classGrade + '\n5. Geographical nomenclature, map work\n\nFORMAT: HTML. Tags: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.\n\nSTRUCTURE (ALL IN ENGLISH):\n<h1>Lesson Plan #' + lessonNum + ' | ' + lessonData.topic + '</h1>\n<h2>1. Topic</h2><p>...</p>\n<h2>2. Objective</h2><ul>...</ul>\n<h2>3. Lesson Type</h2><p>...</p>\n<h2>4. Equipment</h2><ul>...</ul>\n<h2>5. Competencies</h2><ul>...</ul>\n<h2>6. Lesson Flow</h2>\n<h3>I. Organizational moment (2 min)</h3><p>...</p>\n<h3>II. Knowledge activation (5 min)</h3><p>...</p>\n<h3>III. Motivation (3 min)</h3><p>...</p>\n<h3>IV. New material (20 min)</h3><p>...</p>\n<h3>V. Reinforcement (10 min)</h3><p>...</p>\n<h3>VI. Summary (3 min)</h3><p>...</p>\n<h3>VII. Homework (2 min)</h3><p>...</p>\n<h2>7. Additional Materials</h2><p>...</p>\n\nIMPORTANT: All text in ENGLISH.\nReturn ONLY HTML (no DOCTYPE, html, head, body), starting with <h1>.');
 
         var konspektHtml = await this.gemini.generate(methodistPrompt, 0.4);
-        addLog('METHODIST', t('methodistDone'));
-        addLog('METHODIST', t('methodistLength') + ' ' + konspektHtml.length + ' ' + t('chars'));
-        addLog('DESIGNER', t('designerCreate'));
+        addLog('METHODIST', t('methodistDone') + ' #' + lessonNum);
+
         var fullHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + lessonData.topic + '</title><style>body{font-family:Arial,sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:20px;color:#333}h1{color:#1a365d;border-bottom:2px solid #2b6cb0;padding-bottom:10px}h2{color:#2c5282;margin-top:24px}h3{color:#4a5568}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cbd5e0;padding:10px}th{background:#edf2f7}</style></head><body>' + konspektHtml + '</body></html>';
-        var doc = await this.drive.createDocFromHtml('Conspetto: ' + lessonData.topic, fullHtml);
-        addLog('DESIGNER', t('designerDone'));
-        return {
-            docUrl: 'https://docs.google.com/document/d/' + doc.id + '/edit',
-            docId: doc.id, lessonData: lessonData, html: konspektHtml
-        };
+        var doc = await this.drive.createDocFromHtml('Conspetto: ' + lessonData.topic, fullHtml, folderId);
+        addLog('DESIGNER', t('designerDone') + ' #' + lessonNum);
+
+        return { docUrl: 'https://docs.google.com/document/d/' + doc.id + '/edit', docId: doc.id, lessonData: lessonData, html: konspektHtml, lessonNum: lessonNum };
     }
-}
-async function startGeneration() {
-    if (state.isProcessing) return;
-    if (!state.transcript) {
-        alert(currentLang === 'uk' ? 'Спочатку скажіть команду голосом' : 'First speak your command');
-        return;
-    }
-    state.isProcessing = true;
-    $('generateBtn').disabled = true;
-    $('genBtnText').innerHTML = '<span class="spinner"></span> ' + (currentLang === 'uk' ? 'Агенти працюють...' : 'Agents working...');
-    $('micBtn').disabled = true;
-    $('agentLog').innerHTML = '';
-    hide('resultCard'); hide('previewSection'); hide('ktpSelectCard');
-    try {
-        var orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
-        await orchestrator.findAndShowKTP();
-    } catch (err) {
-        console.error(err);
-        addLog('ERROR', err.message);
-        alert('Error: ' + err.message);
-        resetUI();
+
+    async runBatch(parsed, ktpContent, folderId) {
+        var results = [];
+        var total = parsed.lessons.length;
+        $('progressBar').classList.add('visible');
+        for (var i = 0; i < total; i++) {
+            var lessonNum = parsed.lessons[i];
+            addLog('SYSTEM', t('batchProgress') + ' ' + (i + 1) + ' ' + t('batchOf') + ' ' + total + ' — ' + t('lesson') + ' #' + lessonNum);
+            try {
+                var result = await this.generateSingleLesson(lessonNum, parsed, ktpContent, folderId);
+                results.push(result);
+                var pct = ((i + 1) / total) * 100;
+                $('progressFill').style.width = pct + '%';
+            } catch (err) {
+                addLog('ERROR', t('lesson') + ' #' + lessonNum + ': ' + err.message);
+            }
+        }
+        $('progressBar').classList.remove('visible');
+        $('progressFill').style.width = '0%';
+        return results;
     }
 }
 
+// ===================== UI HANDLERS =====================
 function selectKtpItem(index) {
     state.selectedKtp = state.ktpFiles[index];
     document.querySelectorAll('.ktp-item').forEach(function(el) { el.classList.remove('selected'); });
@@ -924,26 +928,92 @@ function selectKtpItem(index) {
     $('confirmKtpBtn').disabled = false;
 }
 
+function selectFolderItem(index) {
+    if (index === -1) { state.selectedFolder = null; }
+    else { state.selectedFolder = state.folders[index]; }
+    document.querySelectorAll('.folder-item').forEach(function(el) { el.classList.remove('selected'); });
+    document.querySelector('.folder-item[data-index="' + index + '"]').classList.add('selected');
+    $('confirmFolderBtn').disabled = false;
+}
+
 async function confirmKTP() {
     if (!state.selectedKtp) return;
     hide('ktpSelectCard');
+    addLog('ANALYST', t('analystRead') + ' "' + state.selectedKtp.name + '"');
+    try {
+        var drive = new DriveClient(state.accessToken);
+        state.ktpContent = await drive.readFile(state.selectedKtp.id, state.selectedKtp.mimeType);
+        addLog('ANALYST', t('analystSize') + ' ' + state.ktpContent.length + ' ' + t('chars'));
+        var orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
+        await orchestrator.findAndShowFolders();
+    } catch (err) {
+        console.error(err); addLog('ERROR', err.message); alert('Error: ' + err.message); resetUI();
+    }
+}
+
+function skipFolder() {
+    state.selectedFolder = null;
+    hide('folderSelectCard');
+    runBatchGeneration();
+}
+
+async function confirmFolder() {
+    hide('folderSelectCard');
+    runBatchGeneration();
+}
+
+async function runBatchGeneration() {
+    var parsed = parsePromptForBatch(state.transcript);
+    if (!parsed.lessons.length) { alert(currentLang === 'uk' ? 'Не вдалося розпізнати номери уроків' : 'Could not recognize lesson numbers'); resetUI(); return; }
+
+    var folderId = state.selectedFolder ? state.selectedFolder.id : null;
+    var folderName = state.selectedFolder ? state.selectedFolder.name : (currentLang === 'uk' ? 'Корінь Диску' : 'Drive Root');
+    addLog('SYSTEM', (currentLang === 'uk' ? 'Папка для збереження: ' : 'Save folder: ') + folderName);
+
     $('generateBtn').disabled = true;
-    $('genBtnText').innerHTML = '<span class="spinner"></span> ' + (currentLang === 'uk' ? 'Генерація конспекту...' : 'Generating plan...');
+    $('genBtnText').innerHTML = '<span class="spinner"></span> ' + (currentLang === 'uk' ? 'Генерація ' + parsed.lessons.length + ' конспектів...' : 'Generating ' + parsed.lessons.length + ' plans...');
+    $('micBtn').disabled = true;
+
     try {
         var orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
-        var result = await orchestrator.runWithSelectedKTP();
-        $('resultLink').href = result.docUrl;
-        $('resultMeta').textContent = (currentLang === 'uk' ? 'Тема' : 'Topic') + ': ' + result.lessonData.topic + ' | ' + (currentLang === 'uk' ? 'Тип' : 'Type') + ': ' + result.lessonData.type + ' | ' + (currentLang === 'uk' ? 'Урок' : 'Lesson') + ' #' + (result.lessonData.lessonNumber || '?');
-        show('resultCard');
-        $('previewFrame').innerHTML = result.html;
-        show('previewSection');
-        addLog('SYSTEM', t('systemReady'));
+        var results = await orchestrator.runBatch(parsed, state.ktpContent, folderId);
+        state.batchResults = results;
+
+        if (results.length > 0) {
+            // Show results
+            var linksDiv = $('resultLinks'); linksDiv.innerHTML = '';
+            results.forEach(function(r) {
+                var a = document.createElement('a');
+                a.href = r.docUrl; a.target = '_blank'; a.className = 'result-link-small';
+                a.innerHTML = '&#128196; ' + (currentLang === 'uk' ? 'Урок' : 'Lesson') + ' #' + r.lessonNum + ': ' + r.lessonData.topic;
+                linksDiv.appendChild(a);
+            });
+            $('resultMeta').textContent = (currentLang === 'uk' ? 'Створено: ' : 'Created: ') + results.length + ' ' + (currentLang === 'uk' ? 'документів' : 'documents') + ' | ' + (currentLang === 'uk' ? 'Папка' : 'Folder') + ': ' + folderName;
+            show('resultCard');
+            if (results[0]) { $('previewFrame').innerHTML = results[0].html; show('previewSection'); }
+            addLog('SYSTEM', t('batchDone'));
+        } else {
+            alert(currentLang === 'uk' ? 'Не вдалося створити жодного конспекту' : 'Failed to create any lesson plans');
+        }
     } catch (err) {
-        console.error(err);
-        addLog('ERROR', err.message);
-        alert('Error: ' + err.message);
+        console.error(err); addLog('ERROR', err.message); alert('Error: ' + err.message);
     } finally {
         resetUI();
+    }
+}
+
+async function startGeneration() {
+    if (state.isProcessing) return;
+    if (!state.transcript) { alert(currentLang === 'uk' ? 'Спочатку скажіть команду голосом' : 'First speak your command'); return; }
+    state.isProcessing = true;
+    $('agentLog').innerHTML = '';
+    hide('resultCard'); hide('previewSection'); hide('ktpSelectCard'); hide('folderSelectCard');
+
+    try {
+        var orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
+        await orchestrator.findAndShowKTP();
+    } catch (err) {
+        console.error(err); addLog('ERROR', err.message); alert('Error: ' + err.message); resetUI();
     }
 }
 
@@ -953,6 +1023,9 @@ function resetUI() {
     $('genBtnText').innerHTML = '&#128640; ' + t('generateBtn').replace('&#128640; ', '');
     $('micBtn').disabled = false;
     $('confirmKtpBtn').disabled = true;
+    $('confirmFolderBtn').disabled = true;
+    $('progressBar').classList.remove('visible');
+    $('progressFill').style.width = '0%';
 }
 
 window.addEventListener('load', init);
