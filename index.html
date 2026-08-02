@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>КонспектоГен — Мультиагентний помічник вчителя</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --surface: #111827;
+            --surface-light: #1f2937;
+            --border: #374151;
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --accent: #0ea5e9;
+            --accent-glow: rgba(14, 165, 233, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --agent-analyst: #f59e0b;
+            --agent-methodist: #10b981;
+            --agent-designer: #8b5cf6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 12px;
+        }
+
+        .badge-free {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Settings */
+        .settings-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface-light);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .input-group small {
+            display: block;
+            margin-top: 4px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--accent-glow);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-google {
+            background: #fff;
+            color: #444;
+            border: 1px solid #ddd;
+        }
+
+        .btn-google:hover {
+            background: #f8f9fa;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-full {
+            width: 100%;
+        }
+
+        /* Status */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--surface-light);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger);
+            transition: all 0.3s;
+        }
+
+        .status-dot.active {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .status-dot.pending {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        /* Voice Button */
+        .voice-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .mic-btn {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid var(--accent);
+            background: var(--surface);
+            color: var(--accent);
+            font-size: 2.5rem;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .mic-btn:hover {
+            background: var(--accent);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .mic-btn.recording {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+        }
+
+        .voice-hint {
+            margin-top: 16px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .voice-transcript {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--surface-light);
+            border-radius: 12px;
+            border-left: 3px solid var(--accent);
+            font-style: italic;
+            color: var(--text-muted);
+            min-height: 50px;
+            display: none;
+        }
+
+        .voice-transcript.visible {
+            display: block;
+        }
+
+        /* Agent Log */
+        .agent-log {
+            background: var(--surface-light);
+            border-radius: 12px;
+            padding: 16px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+        }
+
+        .log-entry {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .log-time {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-right: 8px;
+        }
+
+        .log-agent {
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 8px;
+        }
+
+        .log-agent-analyst { background: rgba(245, 158, 11, 0.15); color: var(--agent-analyst); }
+        .log-agent-methodist { background: rgba(16, 185, 129, 0.15); color: var(--agent-methodist); }
+        .log-agent-designer { background: rgba(139, 92, 246, 0.15); color: var(--agent-designer); }
+        .log-agent-system { background: rgba(14, 165, 233, 0.15); color: var(--accent); }
+        .log-agent-error { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        /* Result */
+        .result-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(14, 165, 233, 0.1));
+            border: 1px solid var(--success);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            display: none;
+        }
+
+        .result-card.visible {
+            display: block;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .result-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 12px 24px;
+            background: var(--success);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .result-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .result-meta {
+            margin-top: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Preview */
+        .preview-section {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .preview-section.visible {
+            display: block;
+        }
+
+        .preview-frame {
+            width: 100%;
+            height: 400px;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: auto;
+            padding: 20px;
+            color: #333;
+        }
+
+        .preview-frame h1 { color: #111; font-size: 1.5rem; margin-bottom: 12px; }
+        .preview-frame h2 { color: #222; font-size: 1.2rem; margin: 16px 0 8px; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .preview-frame h3 { color: #333; font-size: 1rem; margin: 12px 0 6px; }
+        .preview-frame p { margin-bottom: 8px; }
+        .preview-frame ul { margin-left: 20px; margin-bottom: 8px; }
+        .preview-frame table { border-collapse: collapse; width: 100%; margin: 12px 0; }
+        .preview-frame td, .preview-frame th { border: 1px solid #ddd; padding: 8px; }
+        .preview-frame th { background: #f5f5f5; }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Hidden */
+        .hidden { display: none !important; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.6rem; }
+            .container { padding: 16px; }
+            .card { padding: 16px; }
+        }
+    </style>
+<base target="_blank">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎓 КонспектоГен</h1>
+            <p>Мультиагентний помічник вчителя. Голосом → Конспект на Google Диск</p>
+            <span class="badge badge-free">💎 Безкоштовно: GitHub + Gemini + Google Drive</span>
+        </div>
+
+        <!-- Settings Card -->
+        <div class="card" id="settingsCard">
+            <div class="card-title">⚙️ Налаштування доступу</div>
+            <div class="settings-grid">
+                <div class="input-group">
+                    <label>Google OAuth Client ID</label>
+                    <input type="text" id="clientIdInput" placeholder="123456789-abc123.apps.googleusercontent.com">
+                    <small>З Google Cloud Console → APIs & Services → Credentials → OAuth 2.0 Client ID</small>
+                </div>
+                <div class="input-group">
+                    <label>Gemini API Key</label>
+                    <input type="password" id="geminiKeyInput" placeholder="AIza...">
+                    <small>З <a href="https://aistudio.google.com/apikey" target="_blank" style="color: var(--accent);">aistudio.google.com/apikey</a> (безкоштовно, 1500 запитів/день)</small>
+                </div>
+                <button class="btn btn-primary btn-full" onclick="saveSettings()">💾 Зберегти налаштування</button>
+            </div>
+        </div>
+
+        <!-- Auth Card -->
+        <div class="card hidden" id="authCard">
+            <div class="card-title">🔐 Авторизація Google</div>
+            <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.9rem;">
+                Потрібен доступ до Google Диску для читання КТП та створення конспектів.
+            </p>
+            <button class="btn btn-google btn-full" id="signInBtn" onclick="handleSignIn()">
+                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                Увійти через Google
+            </button>
+            <div class="status-bar" style="margin-top: 16px; margin-bottom: 0;">
+                <div class="status-dot" id="authDot"></div>
+                <span id="authStatus">Не авторизовано</span>
+            </div>
+        </div>
+
+        <!-- Main Interface -->
+        <div class="card hidden" id="mainCard">
+            <div class="card-title">🎙️ Голосова команда</div>
+
+            <div class="voice-section">
+                <button class="mic-btn" id="micBtn" onclick="toggleRecording()">🎤</button>
+                <div class="voice-hint" id="voiceHint">Натисніть і скажіть: <br><em>"Сформуй конспект уроку 5, тема ГП Африки, 7 клас, з КТП"</em></div>
+                <div class="voice-transcript" id="transcriptBox"></div>
+            </div>
+
+            <button class="btn btn-success btn-full hidden" id="generateBtn" onclick="startGeneration()">
+                <span id="genBtnText">🚀 Запустити мультиагентів</span>
+            </button>
+        </div>
+
+        <!-- Agent Log -->
+        <div class="card hidden" id="logCard">
+            <div class="card-title">🤖 Робота агентів</div>
+            <div class="agent-log" id="agentLog">
+                <div class="log-entry"><span class="log-time">--:--:--</span><span class="log-agent log-agent-system">СИСТЕМА</span>Очікування команди...</div>
+            </div>
+        </div>
+
+        <!-- Result -->
+        <div class="result-card" id="resultCard">
+            <div class="result-icon">📄</div>
+            <div class="result-title">Конспект створено!</div>
+            <p style="color: var(--text-muted);">Документ збережено на вашому Google Диску</p>
+            <a href="#" class="result-link" id="resultLink" target="_blank">📂 Відкрити в Google Docs</a>
+            <div class="result-meta" id="resultMeta"></div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-section" id="previewSection">
+            <div class="card">
+                <div class="card-title">👁️ Попередній перегляд</div>
+                <div class="preview-frame" id="previewFrame"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== STATE =====================
+        const state = {
+            clientId: localStorage.getItem('gg_client_id') || '',
+            geminiKey: localStorage.getItem('gg_gemini_key') || '',
+            accessToken: sessionStorage.getItem('gg_access_token') || null,
+            isRecording: false,
+            transcript: '',
+            isProcessing: false,
+            tokenClient: null
+        };
+
+        // ===================== UI HELPERS =====================
+        function $(id) { return document.getElementById(id); }
+
+        function show(id) { $(id).classList.remove('hidden'); }
+        function hide(id) { $(id).classList.add('hidden'); }
+
+        function addLog(agent, message) {
+            const log = $('agentLog');
+            const now = new Date().toLocaleTimeString('uk-UA');
+            const agentClass = {
+                'АНАЛІТИК': 'log-agent-analyst',
+                'МЕТОДИСТ': 'log-agent-methodist',
+                'ДИЗАЙНЕР': 'log-agent-designer',
+                'СИСТЕМА': 'log-agent-system',
+                'ПОМИЛКА': 'log-agent-error'
+            }[agent] || 'log-agent-system';
+
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `<span class="log-time">${now}</span><span class="log-agent ${agentClass}">${agent}</span>${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function setAuthStatus(authorized, text) {
+            $('authDot').className = 'status-dot' + (authorized ? ' active' : '');
+            $('authStatus').textContent = text;
+        }
+
+        // ===================== INIT =====================
+        function init() {
+            $('clientIdInput').value = state.clientId;
+            $('geminiKeyInput').value = state.geminiKey;
+
+            if (state.clientId && state.geminiKey) {
+                hide('settingsCard');
+                show('authCard');
+                initGis();
+            }
+
+            if (state.accessToken) {
+                setAuthStatus(true, 'Авторизовано (токен активний)');
+                showMain();
+            }
+        }
+
+        function saveSettings() {
+            const clientId = $('clientIdInput').value.trim();
+            const geminiKey = $('geminiKeyInput').value.trim();
+
+            if (!clientId || !geminiKey) {
+                alert('Будь ласка, заповніть обидва поля');
+                return;
+            }
+
+            localStorage.setItem('gg_client_id', clientId);
+            localStorage.setItem('gg_gemini_key', geminiKey);
+            state.clientId = clientId;
+            state.geminiKey = geminiKey;
+
+            hide('settingsCard');
+            show('authCard');
+            initGis();
+            addLog('СИСТЕМА', 'Налаштування збережено. Увійдіть через Google.');
+        }
+
+        // ===================== GOOGLE AUTH =====================
+        function initGis() {
+            if (!window.google || !state.clientId) return;
+
+            state.tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: state.clientId,
+                scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/documents',
+                callback: (tokenResponse) => {
+                    if (tokenResponse && tokenResponse.access_token) {
+                        state.accessToken = tokenResponse.access_token;
+                        sessionStorage.setItem('gg_access_token', state.accessToken);
+                        setAuthStatus(true, 'Авторизовано ✅');
+                        showMain();
+                        addLog('СИСТЕМА', 'Google авторизація успішна. Доступ до Диску отримано.');
+                    }
+                },
+                error_callback: (err) => {
+                    console.error('GIS error:', err);
+                    addLog('ПОМИЛКА', 'Помилка авторизації: ' + (err.message || 'невідома'));
+                }
+            });
+        }
+
+        function handleSignIn() {
+            if (!state.tokenClient) {
+                alert('Спочатку збережіть налаштування з Client ID');
+                return;
+            }
+            state.tokenClient.requestAccessToken({ prompt: 'consent' });
+        }
+
+        function showMain() {
+            hide('authCard');
+            show('mainCard');
+            show('logCard');
+        }
+
+        // ===================== VOICE =====================
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.lang = 'uk-UA';
+        recognition.continuous = false;
+        recognition.interimResults = false;
+
+        recognition.onresult = (e) => {
+            const text = e.results[0][0].transcript;
+            state.transcript = text;
+            $('transcriptBox').textContent = '"' + text + '"';
+            $('transcriptBox').classList.add('visible');
+            $('voiceHint').innerHTML = 'Розпізнано! Натисніть <strong>"Запустити мультиагентів"</strong>';
+            show('generateBtn');
+            addLog('СИСТЕМА', 'Голос розпізнано: ' + text);
+        };
+
+        recognition.onerror = (e) => {
+            state.isRecording = false;
+            $('micBtn').classList.remove('recording');
+            $('voiceHint').textContent = 'Помилка розпізнавання. Спробуйте ще раз.';
+            addLog('ПОМИЛКА', 'Speech recognition: ' + e.error);
+        };
+
+        recognition.onend = () => {
+            state.isRecording = false;
+            $('micBtn').classList.remove('recording');
+        };
+
+        function toggleRecording() {
+            if (state.isProcessing) return;
+
+            if (state.isRecording) {
+                recognition.stop();
+                state.isRecording = false;
+                $('micBtn').classList.remove('recording');
+            } else {
+                state.transcript = '';
+                $('transcriptBox').classList.remove('visible');
+                hide('generateBtn');
+                recognition.start();
+                state.isRecording = true;
+                $('micBtn').classList.add('recording');
+                $('voiceHint').textContent = 'Слухаю... Скажіть вашу команду';
+                addLog('СИСТЕМА', 'Мікрофон увімкнено. Очікування команди...');
+            }
+        }
+
+        // ===================== DRIVE CLIENT =====================
+        class DriveClient {
+            constructor(token) {
+                this.token = token;
+            }
+
+            async findKTP() {
+                const query = "name contains 'КТП' or name contains 'календарно' or name contains 'тематичний' or name contains 'план' or name contains 'конспект'";
+                const res = await fetch(
+                    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&pageSize=10&fields=files(id,name,mimeType,modifiedTime)`,
+                    { headers: { 'Authorization': `Bearer ${this.token}` } }
+                );
+                if (!res.ok) throw new Error('Drive API error: ' + res.status);
+                const data = await res.json();
+                return data.files || [];
+            }
+
+            async readDoc(fileId, mimeType) {
+                let url;
+                if (mimeType === 'application/vnd.google-apps.document') {
+                    url = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/plain`;
+                } else {
+                    url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+                }
+                const res = await fetch(url, {
+                    headers: { 'Authorization': `Bearer ${this.token}` }
+                });
+                if (!res.ok) throw new Error('Read error: ' + res.status);
+                return await res.text();
+            }
+
+            async createDocFromHtml(title, htmlContent) {
+                const boundary = '-------3141592653589793238462646';
+                const delimiter = "\r\n--" + boundary + "\r\n";
+                const closeDelim = "\r\n--" + boundary + "--";
+
+                const metadata = {
+                    name: title,
+                    mimeType: 'application/vnd.google-apps.document'
+                };
+
+                const multipartBody =
+                    delimiter +
+                    'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+                    JSON.stringify(metadata) +
+                    delimiter +
+                    'Content-Type: text/html; charset=UTF-8\r\n\r\n' +
+                    htmlContent +
+                    closeDelim;
+
+                const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.token}`,
+                        'Content-Type': `multipart/related; boundary="${boundary}"`
+                    },
+                    body: multipartBody
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error('Create doc error: ' + errText);
+                }
+                return await res.json();
+            }
+        }
+
+        // ===================== GEMINI CLIENT =====================
+        class GeminiClient {
+            constructor(apiKey) {
+                this.apiKey = apiKey;
+                this.model = 'gemini-2.5-flash';
+            }
+
+            async generate(prompt, temperature = 0.3) {
+                const res = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }],
+                            generationConfig: {
+                                temperature,
+                                maxOutputTokens: 8192,
+                                topP: 0.9
+                            }
+                        })
+                    }
+                );
+                const data = await res.json();
+                if (data.error) throw new Error(data.error.message);
+                return data.candidates[0].content.parts[0].text;
+            }
+        }
+
+        // ===================== ORCHESTRATOR =====================
+        class Orchestrator {
+            constructor(geminiKey, driveToken) {
+                this.gemini = new GeminiClient(geminiKey);
+                this.drive = new DriveClient(driveToken);
+            }
+
+            parsePrompt(text) {
+                const lessonMatch = text.match(/урок\s*[#№]?\s*(\d+)/i);
+                const classMatch = text.match(/(\d+)[\s-]*клас/i);
+                const topicMatch = text.match(/тема\s+(.+?)(?:,|для|з|на|урок|$)/i);
+                const ktpMatch = /КТП|календарно|тематичний|план/i.test(text);
+
+                return {
+                    lessonNum: lessonMatch ? parseInt(lessonMatch[1]) : null,
+                    classGrade: classMatch ? parseInt(classMatch[1]) : 7,
+                    topicHint: topicMatch ? topicMatch[1].trim() : null,
+                    useKTP: ktpMatch,
+                    raw: text
+                };
+            }
+
+            async run(transcript) {
+                const parsed = this.parsePrompt(transcript);
+                addLog('СИСТЕМА', `Розпізнано: урок №${parsed.lessonNum || '?'}, ${parsed.classGrade} клас, тема: ${parsed.topicHint || 'з КТП'}`);
+
+                // Step 1: Find KTP
+                addLog('АНАЛІТИК', '🔍 Шукаю КТП на Google Диску...');
+                const files = await this.drive.findKTP();
+                if (!files.length) throw new Error('Файли КТП не знайдено на Диску. Завантажте КТП на Google Диск.');
+
+                // Sort by recently modified, pick first
+                files.sort((a, b) => new Date(b.modifiedTime) - new Date(a.modifiedTime));
+                const ktp = files[0];
+                addLog('АНАЛІТИК', `✅ Знайдено: "${ktp.name}" (${ktp.mimeType})`);
+
+                // Step 2: Read KTP
+                addLog('АНАЛІТИК', '📖 Зчитую зміст файлу...');
+                const ktpText = await this.drive.readDoc(ktp.id, ktp.mimeType);
+                const ktpPreview = ktpText.substring(0, 20000);
+                addLog('АНАЛІТИК', `📊 Об\'єм тексту: ${ktpText.length} символів`);
+
+                // Step 3: Analyze with Gemini
+                addLog('АНАЛІТИК', '🧠 Аналізую структуру уроку за допомогою Gemini...');
+                const analysisPrompt = `
+Ти — аналітик навчальних планів. Проаналізуй текст КТП нижче та знайди урок №${parsed.lessonNum || 'вказаний'}.
+${parsed.topicHint ? `Тема уроку повинна стосуватися: "${parsed.topicHint}"` : ''}
+
+Витягни та поверни СТРОГО у форматі JSON без markdown:
+{
+  "topic": "повна тема уроку",
+  "objective": "мета уроку",
+  "type": "тип уроку (комбінований, урок нового знання, урок закріплення тощо)",
+  "equipment": "обладнання та наочність",
+  "competencies": "формування компетенцій",
+  "duration": "кількість годин",
+  "found": true,
+  "lessonNumber": ${parsed.lessonNum || 'null'}
+}
+
+Якщо урок не знайдено, поверни {"found": false, "reason": "пояснення чому не знайдено"}
+
+Текст КТП:
+${ktpPreview}
+`;
+                const analysisText = await this.gemini.generate(analysisPrompt, 0.1);
+
+                let lessonData;
+                try {
+                    const cleanJson = analysisText.replace(/\`\`\`json|\`\`\`/g, '').trim();
+                    lessonData = JSON.parse(cleanJson);
+                } catch(e) {
+                    // Fallback: create basic structure
+                    lessonData = {
+                        found: true,
+                        topic: parsed.topicHint || 'Тема уроку',
+                        objective: 'Опанувати новий матеріал',
+                        type: 'Комбінований урок',
+                        equipment: 'Підручник, атлас, контурна карта',
+                        competencies: 'Предметні та загальнонавчальні',
+                        duration: '45 хв',
+                        lessonNumber: parsed.lessonNum
+                    };
+                }
+
+                if (!lessonData.found) {
+                    throw new Error(lessonData.reason || 'Урок не знайдено в КТП');
+                }
+
+                addLog('АНАЛІТИК', `✅ Урок знайдено: "${lessonData.topic}"`);
+                addLog('АНАЛІТИК', `   Тип: ${lessonData.type} | Обладнання: ${lessonData.equipment || 'не вказано'}`);
+
+                // Step 4: Generate konspekt
+                addLog('МЕТОДИСТ', '📝 Генерую детальний конспект уроку...');
+                const methodistPrompt = `
+Ти — досвідчений методист geography. Створи детальний, професійний конспект уроку для ${parsed.classGrade} класу (вік 12-13 років).
+
+Дані з КТП:
+- Тема: ${lessonData.topic}
+- Мета: ${lessonData.objective}
+- Тип уроку: ${lessonData.type}
+- Обладнання: ${lessonData.equipment || 'атлас, підручник, контурна карта'}
+- Компетенції: ${lessonData.competencies || 'предметні'}
+- Тривалість: ${lessonData.duration || '45 хвилин'}
+
+ВИМОГИ ДО КОНСПЕКТУ:
+1. Повна структура з таймінгом кожного етапу
+2. Конкретні питання до учнів, очікувані відповіді
+3. Інтерактивні елементи: робота в парах, міні-дослідження, цікаві факти
+4. Адаптація під вік ${parsed.classGrade} класу (доступна мова, але без спрощення змісту)
+5. Обов\'язкові елементи: географічна номенклатура, робота з картою, практичні завдання
+
+ФОРМАТ: HTML. Використовуй тільки ці теги: <h1>, <h2>, <h3>, <p>, <ul>, <li>, <table>, <tr>, <td>, <th>, <strong>, <em>, <br>.
+
+СТРУКТУРА:
+<h1>Конспект уроку №${lessonData.lessonNumber || parsed.lessonNum || 'X'} з географії | ${lessonData.topic}</h1>
+
+<h2>1. Тема уроку</h2>
+<p>...</p>
+
+<h2>2. Мета уроку</h2>
+<ul>...</ul>
+
+<h2>3. Тип уроку</h2>
+<p>...</p>
+
+<h2>4. Обладнання та наочність</h2>
+<ul>...</ul>
+
+<h2>5. Компетенції, що формуються</h2>
+<ul>...</ul>
+
+<h2>6. Хід уроку</h2>
+
+<h3>І. Організаційний момент (2 хв)</h3>
+<p>Дії вчителя... Дії учнів...</p>
+
+<h3>ІІ. Актуалізація опорних знань (5 хв)</h3>
+<p>Запитання, фронтальна перевірка...</p>
+
+<h3>ІІІ. Мотивація навчальної діяльності (3 хв)</h3>
+<p>Проблемне питання, цікавий факт...</p>
+
+<h3>IV. Вивчення нового матеріалу (20 хв)</h3>
+<p>Основний зміст з поясненнями, робота з картою, таблицями...</p>
+
+<h3>V. Закріплення вивченого (10 хв)</h3>
+<p>Практичні завдання, тести, робота в групах...</p>
+
+<h3>VI. Підсумок уроку (3 хв)</h3>
+<p>Рефлексія, оцінювання...</p>
+
+<h3>VII. Домашнє завдання (2 хв)</h3>
+<p>Конкретне ДЗ з підручника + творче завдання...</p>
+
+<h2>7. Додаткові матеріали</h2>
+<p>Таблиця, схема, або додаткові факти...</p>
+
+Поверни ТІЛЬКИ HTML-контент (без <!DOCTYPE>, <html>, <head>, <body>), починаючи з <h1>.
+`;
+
+                const konspektHtml = await this.gemini.generate(methodistPrompt, 0.4);
+                addLog('МЕТОДИСТ', '✅ Конспект згенеровано');
+                addLog('МЕТОДИСТ', `   Довжина: ${konspektHtml.length} символів`);
+
+                // Step 5: Create Google Doc
+                addLog('ДИЗАЙНЕР', '📄 Створюю Google Doc на Диску...');
+                const fullHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${lessonData.topic}</title><style>body{font-family:Arial,sans-serif;line-height:1.6;max-width:800px;margin:0 auto;padding:20px;color:#333}h1{color:#1a365d;border-bottom:2px solid #2b6cb0;padding-bottom:10px}h2{color:#2c5282;margin-top:24px}h3{color:#4a5568}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #cbd5e0;padding:10px}th{background:#edf2f7}</style></head><body>${konspektHtml}</body></html>`;
+
+                const doc = await this.drive.createDocFromHtml(`Конспект: ${lessonData.topic}`, fullHtml);
+                addLog('ДИЗАЙНЕР', '✅ Документ створено на Google Диску');
+
+                return {
+                    docUrl: `https://docs.google.com/document/d/${doc.id}/edit`,
+                    docId: doc.id,
+                    lessonData,
+                    html: konspektHtml
+                };
+            }
+        }
+
+        // ===================== MAIN FLOW =====================
+        async function startGeneration() {
+            if (state.isProcessing) return;
+            if (!state.transcript) {
+                alert('Спочатку скажіть команду голосом');
+                return;
+            }
+
+            state.isProcessing = true;
+            $('generateBtn').disabled = true;
+            $('genBtnText').innerHTML = '<span class="spinner"></span> Агенти працюють...';
+            $('micBtn').disabled = true;
+
+            // Clear previous log
+            $('agentLog').innerHTML = '';
+            hide('resultCard');
+            hide('previewSection');
+
+            try {
+                const orchestrator = new Orchestrator(state.geminiKey, state.accessToken);
+                const result = await orchestrator.run(state.transcript);
+
+                // Show result
+                $('resultLink').href = result.docUrl;
+                $('resultMeta').textContent = `Тема: ${result.lessonData.topic} | Тип: ${result.lessonData.type} | Урок №${result.lessonData.lessonNumber || '?'}`;
+                show('resultCard');
+
+                // Show preview
+                $('previewFrame').innerHTML = result.html;
+                show('previewSection');
+
+                addLog('СИСТЕМА', '🎉 Все готово! Конспект збережено на вашому Google Диску.');
+
+            } catch (err) {
+                console.error(err);
+                addLog('ПОМИЛКА', err.message);
+                alert('Помилка: ' + err.message);
+            } finally {
+                state.isProcessing = false;
+                $('generateBtn').disabled = false;
+                $('genBtnText').textContent = '🚀 Запустити мультиагентів';
+                $('micBtn').disabled = false;
+            }
+        }
+
+        // ===================== BOOT =====================
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
